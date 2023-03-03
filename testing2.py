@@ -60,6 +60,7 @@ print(type(m_s))
 print(ml)
 print(type(ml))
 
-a = 'lafjdsijk'
-b = json.loads(a)
-print(b)
+menu_str = obj.check_menu('Tea Leaf Salad')
+menu_dict = json.loads(menu_str)
+print(menu_dict)
+print(type(menu_dict))

@@ -12,6 +12,7 @@ def check():
     str1 = 'Colds'
     str2 = 'Bubble Tea'
     str3 = 'Tomato Salad'
+    str4 = 'Beer'
     shop = obj.collection.find_one({'Menu': menu[0]})
     # print('Shop :', shop)
     # print(type(shop))
@@ -26,12 +27,12 @@ def check():
     # print(menu3)
     for i in menu:
         for j in i:
-            if j == str3:
+            if j == str4:
                 c = obj.collection.find_one({'Menu': i})
                 d = c.get('Shop Name')
                 print('Shop :', d)
-                print(str3)
-                b = i.get(str3)
+                print(str4)
+                b = i.get(str4)
                 list1.append(d)
                 list2.append(b)
                 list3 = zip(list1, list2)

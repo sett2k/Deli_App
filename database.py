@@ -84,7 +84,8 @@ class Deliver:
         menu = self.collection.find().distinct('Menu')
         shop_list = []
         price_list = []
-        str_list = str()
+        count = 0
+        menu_str = str()
         for i in menu:
             for j in i:
                 if j == item:
@@ -94,24 +95,20 @@ class Deliver:
                     shop_list.append(shop_name)
                     price_list.append(price)
                     menu_list = zip(shop_list, price_list)
-                    str_list = json.dumps(dict(menu_list))
-                    break
+                    menu_str = json.dumps(dict(menu_list))
+                    count += 1
                 else:
-                    str_list = 'none'
-        return str_list
+                    count += 0
+        if count > 0:
+            return menu_str
+        else:
+            return 'none'
 
-    def count_cost(self, item):
-        menu = self.collection.find().distinct('Menu')
-        cost = 0
-        for menu_lte in menu:
-            for item_lte in menu_lte:
-                if item_lte == item:
-                    price = menu_lte.get(item)
-                    cost = price
-                    return cost
-                else:
-                    cost = -1
-        return cost
+    def count_cost(self, item, shop):
+        menu_str = self.check_menu(item)
+        menu_dict = json.loads(menu_str)
+        price = menu_dict.get(shop)
+        return price
 
     def create_Str(self):
         # create = self.collection_2.distinct('Address')
@@ -128,3 +125,4 @@ class Deliver:
         return o_input
 
 # obj.showMenu()
+# count cost error - line 105

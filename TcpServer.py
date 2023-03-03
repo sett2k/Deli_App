@@ -37,6 +37,7 @@ class TCPServer:
             if toFindInDatabase == '1':
                 return_r = obj.showMenu()
                 sock.send(return_r.encode())
+                self.order(sock)
             elif toFindInDatabase == '2':
                 self.create_Acc(sock)
             elif toFindInDatabase == '3':
@@ -77,15 +78,15 @@ class TCPServer:
 
     def sign_in(self, socket_client):
         with socket_client as sock:
-            send_s = obj.sign_in_Str()
-            sock.send(send_s.encode())
-            rec = sock.recv(1024).decode()
-            print("Received data :", rec)
-            rec1 = rec.split(',')
-            print(rec1)
-            num = obj.checkPh(int(rec1[0]))
+            send_input = obj.sign_in_Str()
+            sock.send(send_input.encode())
+            rec_input = sock.recv(1024).decode()
+            print("Received data :", rec_input)
+            rec_list = rec_input.split(',')
+            print(rec_list)
+            num = obj.checkPh(int(rec_list[0]))
             if num == 3:
-                num2 = obj.check_pass(int(rec1[0]), rec1[1])
+                num2 = obj.check_pass(int(rec_list[0]), rec_list[1])
                 if num2 == 1:
                     print('Sign-in Success.')
                     menu = obj.showMenu()
@@ -100,33 +101,35 @@ class TCPServer:
 
     def order(self, socket_client):
         with socket_client as sock:
-            send_o = 'Choose Your Menu :'
-            sock.send(send_o.encode())
-            rec = sock.recv(1024).decode()
-            print("Received data :", rec)
-            str_order = obj.check_menu(rec)
-            if 'none' in str_order:
+            send_menu = "Choose Your Menu. If you want to stop your order,\nType 'done' :"
+            sock.send(send_menu.encode())
+            rec_menu = sock.recv(1024).decode()
+            # if 'done' in rec_menu:
+            print("Received data :", rec_menu)
+            menu_check = obj.check_menu(rec_menu)
+            if 'none' in menu_check:
                 print('Your item is unavailable.')
                 self.order(socket_client)
             else:
                 print('Your item is available.')
-                str_order = 'Menu available...\n' + str_order
-                sock.send(str_order.encode())
+                menu_check = 'Menu available...\n' + menu_check
+                sock.send(menu_check.encode())
                 send_order = obj.order_Str()
                 sock.send(send_order.encode())
-                rec1 = sock.recv(1024).decode()
-                list1 = rec1.split(',')
-                print(list1)
-                num = obj.count_cost(rec)
-                if num != -1:
-                    cost = rec + "'s cost = " + str(num)
-                    count = '\n' + 'Count = ' + list1[1]
-                    total = '\n' + 'Total cost = ' + str(num * int(list1[1]))
+                rec_order = sock.recv(1024).decode()
+                list_order = rec_order.split(',')
+                print(list_order)
+                price = obj.count_cost(rec_menu, list_order[0])
+                if price != -1:
+                    cost = rec_menu + "'s cost = " + str(price)
+                    count = '\n' + 'Count = ' + list_order[1]
+                    total = '\n' + 'Total cost = ' + str(price * int(list_order[1]))
                     send_cost = cost + count + total
                     sock.send(send_cost.encode())
                 else:
                     print('invalid.')
-
+            # else:
+            #     self.order(sock)
 
     def to_Find(self, toFindInDatabase):
         db = FetchData.DatabaseClass(toFindInDatabase)
@@ -142,5 +145,6 @@ if __name__ == "__main__":
 
 # order check
 # if not done, can order continuously
-# count cost
+# count cost error
 # split order function if needed
+# add to cart

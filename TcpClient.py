@@ -25,49 +25,51 @@ class Client:
         else:
             print('______ Our Menu-Book ______')
             print(receive)
+            menu_input = self.client.recv(1024).decode()
+            self.order(menu_input)
         self.client.close()
 
-    def create(self, rec, a):
-        str1 = obj.splitData(rec, a)
-        self.client.send(str1.encode())
-        rec_2 = self.client.recv(1024).decode()
-        rec_3 = self.client.recv(1024).decode()
-        if rec_3 == rec:
-            print(rec_2)
-            self.create(rec_3, a)
+    def create(self, rec_input, a):
+        str_input = obj.splitData(rec_input, a)
+        self.client.send(str_input.encode())
+        reason = self.client.recv(1024).decode()
+        rec_check = self.client.recv(1024).decode()
+        if rec_check == rec_input:
+            print(reason)
+            self.create(rec_check, a)
         else:
             print("Registration Complete.\nPls sign in to use our app.")
             # print(rec, '\n', rec_2, '\n', rec_3)
-            self.sign_in(rec_2, '*')
+            self.sign_in(reason, '*')
 
-    def sign_in(self, rec, a):
-        str1 = obj.splitData(rec, a)
-        self.client.send(str1.encode())
-        rec1 = self.client.recv(1024).decode()
-        if rec1 == rec:
+    def sign_in(self, rec_input, a):
+        send_input = obj.splitData(rec_input, a)
+        self.client.send(send_input.encode())
+        rec_check = self.client.recv(1024).decode()
+        if rec_check == rec_input:
             print('try again.')
-            self.sign_in(rec1, a)
+            self.sign_in(rec_check, a)
         else:
             print('Signed-in Success.\n_____ Our Menu _____')
-            print(rec1)
-            rec2 = self.client.recv(1024).decode()
-            self.order(rec2)
+            print(rec_check)
+            rec_input2 = self.client.recv(1024).decode()
+            self.order(rec_input2)
 
-    def order(self, rec):
-        send_menu = input(rec)
+    def order(self, rec_input):
+        send_menu = input(rec_input)
         self.client.send(send_menu.encode())
-        rec2 = self.client.recv(1024).decode()
-        if rec2 != rec:
-            print(rec2)
-            rec3 = self.client.recv(1024).decode()
-            str2 = obj.splitData(rec3, '&')
-            self.client.send(str2.encode())
+        menu_check = self.client.recv(1024).decode()
+        if menu_check != rec_input:
+            print(menu_check)
+            rec_order = self.client.recv(1024).decode()
+            send_order = obj.splitData(rec_order, '&')
+            self.client.send(send_order.encode())
             rec_cost = self.client.recv(1024).decode()
             print('\n' + rec_cost)
             print('Your order is confirmed.')
         else:
             print('Your item is unavailable.')
-            self.order(rec2)
+            self.order(menu_check)
 
 
 if __name__ == "__main__":
