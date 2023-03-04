@@ -101,33 +101,52 @@ class TCPServer:
 
     def order(self, socket_client):
         with socket_client as sock:
-            send_menu = "Choose Your Menu. If you want to stop your order,\nType 'done' :"
-            sock.send(send_menu.encode())
-            rec_menu = sock.recv(1024).decode()
+            send_option = "\nPress '1' to pick menu.\nPress '2' to drop menu.\nPress '3' to confirm order.\n" \
+                        "Press '4' to cancel order.\nEnter your option :"
+            sock.send(send_option.encode())
+            rec_option = sock.recv(1024).decode()
             # if 'done' in rec_menu:
-            print("Received data :", rec_menu)
-            menu_check = obj.check_menu(rec_menu)
-            if 'none' in menu_check:
-                print('Your item is unavailable.')
-                self.order(socket_client)
-            else:
-                print('Your item is available.')
-                menu_check = 'Menu available...\n' + menu_check
-                sock.send(menu_check.encode())
-                send_order = obj.order_Str()
-                sock.send(send_order.encode())
-                rec_order = sock.recv(1024).decode()
-                list_order = rec_order.split(',')
-                print(list_order)
-                price = obj.count_cost(rec_menu, list_order[0])
-                if price != -1:
-                    cost = rec_menu + "'s cost = " + str(price)
-                    count = '\n' + 'Count = ' + list_order[1]
-                    total = '\n' + 'Total cost = ' + str(price * int(list_order[1]))
-                    send_cost = cost + count + total
-                    sock.send(send_cost.encode())
-                else:
-                    print('invalid.')
+            print("Received option :", rec_option)
+            if '1' in rec_option:
+                total_list = []
+                while True:
+                    print('while loop.')
+                    send_menu = "Choose your menu. Type 'done' if you've finished :"
+                    sock.send(send_menu.encode())
+                    rec_menu = sock.recv(1024).decode()
+                    print(rec_menu)
+                    if 'done' in rec_menu:
+                        check = obj.total_cost(total_list, 'Prepaid')
+                        print(type(check))
+                        sock.send(check.encode())
+                        print(check)
+                        break
+                    else:
+                        menu_check = obj.check_menu(rec_menu)
+                        if 'none' in menu_check:
+                            print('Your item is unavailable.')
+                            # self.order(socket_client)
+                        else:
+                            print('Your item is available.')
+                            menu_check = 'Menu available...\n' + menu_check
+                            sock.send(menu_check.encode())
+                            send_order = obj.order_Str()
+                            sock.send(send_order.encode())
+                            rec_order = sock.recv(1024).decode()
+                            list_order = rec_order.split(',')
+                            list_order.append(list_order[1])
+                            list_order[1] = rec_menu
+                            total_list.append(list_order)
+                            print(list_order)
+                            price = obj.count_cost(list_order[0], list_order[1], list_order[2])
+                            sock.send(price.encode())
+                print('break')
+            elif '2' in rec_option:
+                print('2')
+            elif '3' in rec_option:
+                print('3')
+            elif '4' in rec_option:
+                print('4')
             # else:
             #     self.order(sock)
 

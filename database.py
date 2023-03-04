@@ -35,6 +35,7 @@ class Deliver:
         ]
         # try:
         #     self.collection.insert_many(data)
+        #     self.collection.insert_many(data_2)
         #     print('Data Inserted.')
         # except Exception as error:
         #     print(error)
@@ -51,7 +52,6 @@ class Deliver:
             for key in shop_dict:
                 shop_menu += key + ' - ' + str(shop_dict[key]) + '\n'
             shop_menu = 'MENU available at ' + i + '....' + '\n' + shop_menu
-            # shop_menu = i + ' - ' + shop_name.get('Menu')
             menu = menu + '\n' + shop_menu
         menu += 'You can order now...'
         return menu
@@ -104,11 +104,34 @@ class Deliver:
         else:
             return 'none'
 
-    def count_cost(self, item, shop):
+    def count_cost(self, shop, item, count):
         menu_str = self.check_menu(item)
         menu_dict = json.loads(menu_str)
         price = menu_dict.get(shop)
-        return price
+        cost = item + "'s cost = " + str(price)
+        # count = '\n' + 'Count = ' + count
+        # total = '\n' + 'Total cost = ' + str(price * int(count))
+        # cost = cost + count + total
+        return cost
+
+    def total_cost(self, total_list, payment):
+        total = 0
+        menu_list = str()
+        for list_i in total_list:
+            menu_str = self.check_menu(list_i[1])
+            menu_dict = json.loads(menu_str)
+            price = menu_dict.get(list_i[0])
+            cost = price * int(list_i[2])
+            total += cost
+            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') = ' + str(cost) + '\n'
+        deli_fee = 3000
+        total += deli_fee
+        deli_fee2 = 'Deli fees = ' + str(deli_fee) + '\n'
+        payment_type = 'Payment Type >> ' + payment + '\n'
+        menu = '......dailY deli......\n'
+        menu += menu_list + deli_fee2 + 'Total cost = ' + str(total) + '\n' + payment_type + '--- THANK YOU FOR ' \
+                                                                                             'SUPPORTING US! ---'
+        return menu
 
     def create_Str(self):
         # create = self.collection_2.distinct('Address')
@@ -121,7 +144,7 @@ class Deliver:
         return s_input
 
     def order_Str(self):
-        o_input = 'Choose Shop Name :&Enter item count :'
+        o_input = 'Choose Shop Name :&Enter the item count :'
         return o_input
 
 # obj.showMenu()

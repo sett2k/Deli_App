@@ -56,20 +56,36 @@ class Client:
             self.order(rec_input2)
 
     def order(self, rec_input):
-        send_menu = input(rec_input)
-        self.client.send(send_menu.encode())
-        menu_check = self.client.recv(1024).decode()
-        if menu_check != rec_input:
-            print(menu_check)
-            rec_order = self.client.recv(1024).decode()
-            send_order = obj.splitData(rec_order, '&')
-            self.client.send(send_order.encode())
-            rec_cost = self.client.recv(1024).decode()
-            print('\n' + rec_cost)
-            print('Your order is confirmed.')
-        else:
-            print('Your item is unavailable.')
-            self.order(menu_check)
+        send_option = input(rec_input)
+        self.client.send(send_option.encode())
+        print(send_option)
+        while True:
+            print('while loop.')
+            print(send_option)
+            menu_pick = self.client.recv(4096).decode()
+            # menu_pick2 = self.client.recv(1024).decode()
+            print(menu_pick)
+            send_menu = input(menu_pick)
+            self.client.send(send_menu.encode())
+            print(send_menu)
+            if 'done' in send_menu:
+                rec_check = self.client.recv(1024).decode()
+                print(rec_check)
+                break
+            else:
+                menu_check = self.client.recv(1024).decode()
+                if menu_check != menu_pick:
+                    print(menu_pick)
+                    print(menu_check)
+                    rec_order = self.client.recv(1024).decode()
+                    send_order = obj.splitData(rec_order, '&')
+                    self.client.send(send_order.encode())
+                    rec_price = self.client.recv(1024).decode()
+                    print('\n' + rec_price)
+                    # print('Your order is confirmed.')
+                else:
+                    print('Your item is unavailable.')
+                    self.order(menu_pick)
 
 
 if __name__ == "__main__":

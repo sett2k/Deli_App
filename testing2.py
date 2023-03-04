@@ -53,14 +53,33 @@ m_s = str()
 for key in m_m:
     m_s += key + ' - ' + str(m_m[key]) + ',\n'
 ml = m_s.split(',\n')
-print(m_m)
-print(type(m_m))
-print(m_s)
-print(type(m_s))
-print(ml)
-print(type(ml))
+# print(m_m)
+# print(type(m_m))
+# print(m_s)
+# print(type(m_s))
+# print(ml)
+# print(type(ml))
 
 menu_str = obj.check_menu('Tea Leaf Salad')
 menu_dict = json.loads(menu_str)
 print(menu_dict)
 print(type(menu_dict))
+
+total_list = []
+list3 = [1, 2, 3]
+list1 = ['one', 22, 'three']
+list2 = ['two', 33, 'four']
+list2.append(list2[2])
+list2[2] = 'five'
+print(list2)
+# list4 = zip(list2, list1)
+# print(list4)
+# print(type(list4))
+# total_list.append(list1)
+# total_list.append(list2)
+# list1.append(list3)
+# total_list.append(list1)
+# print(total_list)
+# print(total_list[0][1])
+# print(total_list[1][2])
+# print(total_list[0][3][0])
