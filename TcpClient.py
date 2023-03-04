@@ -25,8 +25,8 @@ class Client:
         else:
             print('______ Our Menu-Book ______')
             print(receive)
-            menu_input = self.client.recv(1024).decode()
-            self.order(menu_input)
+            # menu_input = self.client.recv(1024).decode()
+            self.order()
         self.client.close()
 
     def create(self, rec_input, a):
@@ -52,40 +52,58 @@ class Client:
         else:
             print('Signed-in Success.\n_____ Our Menu _____')
             print(rec_check)
-            rec_input2 = self.client.recv(1024).decode()
-            self.order(rec_input2)
+            # rec_input2 = self.client.recv(1024).decode()
+            self.order()
 
-    def order(self, rec_input):
-        send_option = input(rec_input)
-        self.client.send(send_option.encode())
-        print(send_option)
+    def order(self):
         while True:
-            print('while loop.')
-            print(send_option)
-            menu_pick = self.client.recv(4096).decode()
-            # menu_pick2 = self.client.recv(1024).decode()
-            print(menu_pick)
-            send_menu = input(menu_pick)
-            self.client.send(send_menu.encode())
-            print(send_menu)
-            if 'done' in send_menu:
-                rec_check = self.client.recv(1024).decode()
-                print(rec_check)
-                break
+            rec_input = self.client.recv(1024).decode()
+            if 'cost' in rec_input:
+                print(rec_input)
+                self.order()
             else:
-                menu_check = self.client.recv(1024).decode()
-                if menu_check != menu_pick:
-                    print(menu_pick)
-                    print(menu_check)
-                    rec_order = self.client.recv(1024).decode()
-                    send_order = obj.splitData(rec_order, '&')
-                    self.client.send(send_order.encode())
-                    rec_price = self.client.recv(1024).decode()
-                    print('\n' + rec_price)
-                    # print('Your order is confirmed.')
-                else:
-                    print('Your item is unavailable.')
-                    self.order(menu_pick)
+                if '@' in rec_input:
+                    rec_list = rec_input.split('@')
+                    # print(rec_list)
+                    print(rec_list[0])
+                    del rec_list[0]
+                    list_to_str = str()
+                    list_to_str = list_to_str.join(rec_list)
+                    rec_input = list_to_str
+
+                send_input = obj.splitData(rec_input, '&')
+                print(send_input)
+                self.client.send(send_input.encode())
+        # send_option = input(rec_input)
+        # self.client.send(send_option.encode())
+        # print(send_option)
+        # while True:
+        #     print('while loop.')
+        #     print(send_option)
+        #     menu_pick = self.client.recv(4096).decode()
+        #     # menu_pick2 = self.client.recv(1024).decode()
+        #     print(menu_pick)
+        #     send_menu = input(menu_pick)
+        #     self.client.send(send_menu.encode())
+        #     print(send_menu)
+        #     if 'done' in send_menu:
+        #         rec_check = self.client.recv(1024).decode()
+        #         print(rec_check)
+        #         break
+        #     else:
+        #         menu_check = self.client.recv(1024).decode()
+        #         if menu_check != menu_pick:
+        #             print(menu_pick)
+        #             print(menu_check)
+        #             rec_order = self.client.recv(1024).decode()
+        #             send_order = obj.splitData(rec_order, '&')
+        #             self.client.send(send_order.encode())
+        #             rec_price = self.client.recv(1024).decode()
+        #             print('\n' + rec_price)
+        #             # print('Your order is confirmed.')
+        #         else:
+        #             print('Your item is unavailable.')
+        #             self.order()
 
 
 if __name__ == "__main__":

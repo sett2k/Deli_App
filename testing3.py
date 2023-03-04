@@ -83,29 +83,29 @@ def count_cost(shop, item, count):
     return cost
 
 
-def check_menu(item):
-    menu = obj.collection.find().distinct('Menu')
-    shop_list = []
-    price_list = []
-    count = 0
-    menu_str = str()
-    for i in menu:
-        for j in i:
-            if j == item:
-                menu_dict = obj.collection.find_one({'Menu': i})
-                shop_name = menu_dict.get('Shop Name')
-                price = i.get(item)
-                shop_list.append(shop_name)
-                price_list.append(price)
-                menu_list = zip(shop_list, price_list)
-                menu_str = json.dumps(dict(menu_list))
-                count += 1
-            else:
-                count += 0
-    if count > 0:
-        return menu_str
-    else:
-        return 'none'
+# def check_menu(item):
+#     menu = obj.collection.find().distinct('Menu')
+#     shop_list = []
+#     price_list = []
+#     count = 0
+#     menu_str = str()
+#     for i in menu:
+#         for j in i:
+#             if j == item:
+#                 menu_dict = obj.collection.find_one({'Menu': i})
+#                 shop_name = menu_dict.get('Shop Name')
+#                 price = i.get(item)
+#                 shop_list.append(shop_name)
+#                 price_list.append(price)
+#                 menu_list = zip(shop_list, price_list)
+#                 menu_str = json.dumps(dict(menu_list))
+#                 count += 1
+#             else:
+#                 count += 0
+#     if count > 0:
+#         return menu_str
+#     else:
+#         return 'none'
 
 
 if __name__ == '__main__':

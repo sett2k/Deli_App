@@ -1,78 +1,57 @@
-# import pickle
-#
-# data = [{"_id": 1, "Shop Name": "Barlala", "Menu": "Beer, Colds, Juices, BBQ, Hotpot, Salads, Many Fried Snacks, "
-#                                                    "Beverages"},
-#         {"_id": 2, "Shop Name": "MayKantKaw", "Menu": "Tea Leaf Salad, Popcorn Salad, Ginger Salad, Pennyworth Salad, "
-#                                                       "Tomato Salad"},
-#         {"_id": 3, "Shop Name": "Thu Tasty", "Menu": "Lemon, Lime, Orange, Strawberry, Aml, Grape, Apple, Pineapple, "
-#                                                      "Watermelon"},
-#         {"_id": 4, "Shop Name": "Lotteria", "Menu": "Fried Chicken, Burger, Cola, fries, rice box"}]
-# listToStr = ' '.join(map(str, data))
-# # print(type(listToStr))
-# # print(listToStr)
-#
-#
-# dic = {"_id": 4, "Shop Name": "Lotteria", "Menu": "Fried Chicken, Burger, Cola, Fries, Rice Box"}
-# # msg = pickle.dumps(dic)
-# # red = pickle.loads(msg)
-# # msg = bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8') + msg
-# print(type(dic))
-# print(dic)
-# # print(msg)
-# # print(type(msg))
-# # print(red)
-# # print(type(red))
-# strg = str(dic)
-# print(type(strg))
-# print(strg)
-#
-# # phNo = int(input("Enter Your PhoneNumber :"))
-# # name = input('Enter Your Username    :')
-# # p_word = input('Enter Your Password    :')
-# # c_pass = input('Confirm Your Password  :')
-# # addr = input('Enter Your Address     :')
-# # dic_c = {"Username": name, "Password": p_word, "PhoneNumber": phNo, "Address": addr}
-# # c_str = str(dic_c)
-# # print(dic_c)
-# # print(type(dic_c))
-# # print(c_str)
-# # print(type(c_str))
-# c_input = 'iEnter Your PhoneNumber :, Enter Your Name :, Enter Your Password :, Confirm Your Password :, ' \
-#                   'Enter Your Address : '
-# s_input = c_input.split(', ')
-# print(type(s_input))
-# print(s_input)
-# for i in s_input:
+# str1 = 'Enter Your PhoneNumber :*Enter Your Username    :$Enter Your Password    :' \
+#                   '$Confirm Your Password  :$Enter Your Address     :'
+# list1 = str1.split('*')
+# str2 = str()
+# print(list1)
+# print(list1[0] + 'l')
+# del list1[0]
+# print(list1)
+# str2 = str2.join(list1)
+# print(str2)
+# list2 = str2.split('$')
+# for i in list2:
 #     print(i)
-# list_to_str = '\n'.join(map(str, s_input))
-# print(type(list_to_str))
-# print(list_to_str)
-
-from database import Deliver
-lit = [959, 'aung', 'kaung', 'kaung', 'sett']
-print(lit[2])
-print(lit[3])
-if lit[2] != lit[3]:
-    print("same.")
-else:
-    print("different.")
-
-obj = Deliver()
-id_ = obj.collection_2.find().distinct("_id")
-print(id_)
-print("len :", len(id_))
-i = len(id_)
-print(type(i))
-print("Last index :", id_[i-1])
-for i in id_:
-    print(i)
-
-lit = ['959222222222', ' fi']
-phNo = obj.collection_2.find().distinct('PhoneNumber')
-print(phNo)
-for i in phNo:
-    print(i)
-    if int(lit[0]) == i:
-        print("same.")
-    else:
-        print('different')
+#
+# a = 'HellO'
+# b = 'hello'
+# print(a.upper(), b.upper())
+# if a == b:
+#     print('same')
+# if a.upper() == b.upper():
+#     print('same same')
+#
+# print(a.capitalize(), b.capitalize())
+# print(a, b)
+# total_list = [['barlala', 'beer', '10'], ['loTTeria', 'PIZZA', '2'], ['Pan-Ei', 'Tomato Salad', '5']]
+# print(total_list)
+# print('\n')
+# for list_a in total_list:
+#     for b in range(len(list_a)):
+#         if b == 0:
+#             list_a[b] = list_a[b].upper()
+#         else:
+#             list_a[b] = list_a[b].capitalize()
+# print(total_list)
+# print('Length 1 :', len(total_list))
+# str3 = '\n'.join(map(str, total_list))
+# print('string :', str3)
+# for i in range(len(total_list)):
+#     total_list.pop(0)
+# print(total_list)
+# print(type(total_list))
+# print('Length 2 :', len(total_list))
+total_list = [['barlala', 'beer', '10'], ['loTTeria', 'PIZZA', '2'], ['Pan-Ei', 'Tomato Salad', '5']]
+print(total_list)
+drop_list = ['Tomato Salad', '5']
+# length = len(total_list)
+# for i in range(length):
+#     print('a')
+#     if total_list[i][1].title() == drop_list[0].title():
+#         menu = int(total_list[i][2])
+#         drop = int(drop_list[1])
+#         menu -= drop
+#         total_list[i][2] = str(menu)
+#         if menu <= 0:
+#             total_list.pop(i)
+#             break
+print(total_list)

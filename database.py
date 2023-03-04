@@ -88,10 +88,10 @@ class Deliver:
         menu_str = str()
         for i in menu:
             for j in i:
-                if j == item:
+                if j.title() == item.title():
                     menu_dict = self.collection.find_one({'Menu': i})
                     shop_name = menu_dict.get('Shop Name')
-                    price = i.get(item)
+                    price = i.get(item.title())
                     shop_list.append(shop_name)
                     price_list.append(price)
                     menu_list = zip(shop_list, price_list)
@@ -104,19 +104,30 @@ class Deliver:
         else:
             return 'none'
 
-    def count_cost(self, shop, item, count):
-        menu_str = self.check_menu(item)
+    def count_cost(self, shop, item, number):
+        shop1 = shop.upper()
+        item1 = item.title()
+        menu_str = self.check_menu(item1)
         menu_dict = json.loads(menu_str)
-        price = menu_dict.get(shop)
-        cost = item + "'s cost = " + str(price)
-        # count = '\n' + 'Count = ' + count
-        # total = '\n' + 'Total cost = ' + str(price * int(count))
-        # cost = cost + count + total
+        price = menu_dict.get(shop1)
+        # count = str()
+        item_cost = price * int(number)
+        cost = item1 + "'s cost = " + str(price)
+        count = '\nCount = ' + number
+        total = '\nTotal cost = ' + str(item_cost)
+        cost += count + total
         return cost
 
     def total_cost(self, total_list, payment):
         total = 0
         menu_list = str()
+        for list_a in total_list:
+            for b in range(len(list_a)):
+                if b == 0:
+                    list_a[b] = list_a[b].upper()
+                else:
+                    list_a[b] = list_a[b].title()
+
         for list_i in total_list:
             menu_str = self.check_menu(list_i[1])
             menu_dict = json.loads(menu_str)
@@ -127,7 +138,7 @@ class Deliver:
         deli_fee = 3000
         total += deli_fee
         deli_fee2 = 'Deli fees = ' + str(deli_fee) + '\n'
-        payment_type = 'Payment Type >> ' + payment + '\n'
+        payment_type = "Payment Type >> '" + payment + "'\n"
         menu = '......dailY deli......\n'
         menu += menu_list + deli_fee2 + 'Total cost = ' + str(total) + '\n' + payment_type + '--- THANK YOU FOR ' \
                                                                                              'SUPPORTING US! ---'
