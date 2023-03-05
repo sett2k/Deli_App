@@ -25,7 +25,6 @@ class Client:
         else:
             print('______ Our Menu-Book ______')
             print(receive)
-            # menu_input = self.client.recv(1024).decode()
             self.order()
         self.client.close()
 
@@ -72,42 +71,12 @@ class Client:
                     rec_input = list_to_str
 
                 send_input = obj.splitData(rec_input, '&')
-                print(send_input)
+                # print(send_input)
                 self.client.send(send_input.encode())
-        # send_option = input(rec_input)
-        # self.client.send(send_option.encode())
-        # print(send_option)
-        # while True:
-        #     print('while loop.')
-        #     print(send_option)
-        #     menu_pick = self.client.recv(4096).decode()
-        #     # menu_pick2 = self.client.recv(1024).decode()
-        #     print(menu_pick)
-        #     send_menu = input(menu_pick)
-        #     self.client.send(send_menu.encode())
-        #     print(send_menu)
-        #     if 'done' in send_menu:
-        #         rec_check = self.client.recv(1024).decode()
-        #         print(rec_check)
-        #         break
-        #     else:
-        #         menu_check = self.client.recv(1024).decode()
-        #         if menu_check != menu_pick:
-        #             print(menu_pick)
-        #             print(menu_check)
-        #             rec_order = self.client.recv(1024).decode()
-        #             send_order = obj.splitData(rec_order, '&')
-        #             self.client.send(send_order.encode())
-        #             rec_price = self.client.recv(1024).decode()
-        #             print('\n' + rec_price)
-        #             # print('Your order is confirmed.')
-        #         else:
-        #             print('Your item is unavailable.')
-        #             self.order()
 
 
 if __name__ == "__main__":
     # clientMessage = input("Enter message to send:>")
-    print("+======== WELCOME TO dailY deli =========+")
+    print('+======== WELCOME TO "dailY deli" =========+')
     ClientConnector = Client()
     ClientConnector.runClient()

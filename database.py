@@ -53,7 +53,7 @@ class Deliver:
                 shop_menu += key + ' - ' + str(shop_dict[key]) + '\n'
             shop_menu = 'MENU available at ' + i + '....' + '\n' + shop_menu
             menu = menu + '\n' + shop_menu
-        menu += 'You can order now...'
+        menu += '!You can order now!'
         return menu
 
     def checkPh(self, phNo):
@@ -134,7 +134,7 @@ class Deliver:
             price = menu_dict.get(list_i[0])
             cost = price * int(list_i[2])
             total += cost
-            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') = ' + str(cost) + '\n'
+            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') -> "' + list_i[0] + '" = ' + str(cost) + '\n'
         deli_fee = 3000
         total += deli_fee
         deli_fee2 = 'Deli fees = ' + str(deli_fee) + '\n'
@@ -144,8 +144,14 @@ class Deliver:
                                                                                              'SUPPORTING US! ---'
         return menu
 
+    def menu_list(self, list_menu):
+        for list_i in list_menu:
+            list_i[0] = list_i[0].upper()
+            list_i[1] = list_i[1].title()
+        reply = '___Your Menu Chart___ \n' + '\n'.join(map(str, list_menu)) + '@\n'
+        return reply
+
     def create_Str(self):
-        # create = self.collection_2.distinct('Address')
         c_input = 'Enter Your PhoneNumber :$Enter Your Username    :$Enter Your Password    :' \
                   '$Confirm Your Password  :$Enter Your Address     :'
         return c_input
@@ -155,8 +161,5 @@ class Deliver:
         return s_input
 
     def order_Str(self):
-        o_input = 'Choose Shop Name :&Enter the item count :'
+        o_input = 'Choose Shop Name     :&Enter the item count :'
         return o_input
-
-# obj.showMenu()
-# count cost error - line 105

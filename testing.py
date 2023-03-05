@@ -42,7 +42,7 @@
 # print('Length 2 :', len(total_list))
 total_list = [['barlala', 'beer', '10'], ['loTTeria', 'PIZZA', '2'], ['Pan-Ei', 'Tomato Salad', '5']]
 print(total_list)
-drop_list = ['Tomato Salad', '5']
+drop_list = ['Pan-Ei', 'Tomato Salad', '5']
 # length = len(total_list)
 # for i in range(length):
 #     print('a')
@@ -55,3 +55,16 @@ drop_list = ['Tomato Salad', '5']
 #             total_list.pop(i)
 #             break
 print(total_list)
+lisst = []
+for list_o in total_list:
+    if list_o[0] == drop_list[0] and list_o[1] == drop_list[1]:
+        count1 = int(list_o[2])
+        count2 = int(drop_list[2])
+        count1 += count2
+        list_o[2] = str(count1)
+        print(list_o)
+    else:
+        total_list.append(drop_list)
+cancel = 'Order Cancelled!'
+cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list))
+print(cancel)

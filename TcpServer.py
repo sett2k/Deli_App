@@ -1,6 +1,5 @@
 import socket
 import threading
-import FetchData
 # import pymongo
 from database import Deliver
 
@@ -30,7 +29,6 @@ class TCPServer:
 
     def handle_client(self, client_socket):
         with client_socket as sock:
-            global request
             request = sock.recv(1024)
             toFindInDatabase = request.decode()
             print('Received Data From Client:', toFindInDatabase)
@@ -38,8 +36,8 @@ class TCPServer:
             if toFindInDatabase == '1':
                 return_r = obj.showMenu()
                 sock.send(return_r.encode())
-                menu = 'Menu Session >>>@'
-                self.order(sock, menu)
+                order = '\nOrder Session...@'
+                self.order(sock, order)
             elif toFindInDatabase == '2':
                 self.create_Acc(sock)
             elif toFindInDatabase == '3':
@@ -64,10 +62,9 @@ class TCPServer:
                         id1 = obj.collection_2.find().distinct('_id')
                         i = len(id1)
                         obj.collection_2.insert_one({'_id': id1[i - 1] + 1, 'Username': receive_1[1], 'Password':
-                            receive_1[2], 'PhoneNumber': int(receive_1[0]), 'Address': receive_1[4]})
+                                                    receive_1[2], 'PhoneNumber': int(receive_1[0]),
+                                                     'Address': receive_1[4]})
                         print("Data Inserted.")
-                        # send_s = self.sign_in_Str()
-                        # sock.send(send_s.encode())
                         self.sign_in(sock)
                 else:
                     temp3 = 'Password must have at least 8 counts.'
@@ -104,67 +101,32 @@ class TCPServer:
 
     def order(self, socket_client, str_order):
         with socket_client as sock:
-            send_option = "\nPress '1' to pick menu.\nPress '2' to drop menu.\nPress '3' to confirm order.\n" \
-                          "Press '4' to cancel order.\nEnter your option :"
+            send_option = "Press '1' to pick menu.\nPress '2' to update menu.\nPress '3' to confirm order.\n" \
+                          "Press '4' to cancel order.\nPress '5' to exit.\nEnter your option :"
             send_option = str_order + send_option
-            # print(send_option)
             sock.send(send_option.encode())
             rec_option = sock.recv(1024).decode()
-            # if 'done' in rec_menu:
             print("Received option :", rec_option)
             # total_list = []
             print('Total List :', total_list)
             if '1' in rec_option:
                 self.pick_menu(sock)
-
-                # while True:
-                #     print('while loop.')
-                #     # send_menu = "Choose your menu. Type 'done' if you've finished :"
-                #     # sock.send(send_menu.encode())
-                #     # rec_menu = sock.recv(1024).decode()
-                #     # print(rec_menu)
-                #     if 'done' in rec_menu:
-                #         check = obj.total_cost(total_list, 'Prepaid')
-                #         print(type(check))
-                #         sock.send(check.encode())
-                #         print(check)
-                #         break
-                #     else:
-                #         # menu_check = obj.check_menu(rec_menu)
-                #         # if 'none' in menu_check:
-                #         #     print('Your item is unavailable.')
-                #         #     # self.order(socket_client)
-                #         # else:
-                #         #     print('Your item is available.')
-                #         #     menu_check = 'Menu available...\n' + menu_check
-                #         #     sock.send(menu_check.encode())
-                #         #     send_order = obj.order_Str()
-                #         #     sock.send(send_order.encode())
-                #         #     rec_order = sock.recv(1024).decode()
-                #         #     list_order = rec_order.split(',')
-                #         #     list_order.append(list_order[1])
-                #         #     list_order[1] = rec_menu
-                #         #     total_list.append(list_order)
-                #         #     print(list_order)
-                #         #     price = obj.count_cost(list_order[0], list_order[1], list_order[2])
-                #         #     sock.send(price.encode())
-                print('break')
             elif '2' in rec_option:
-                self.drop_menu(sock)
+                self.update_menu(sock)
             elif '3' in rec_option:
-                payment = "Choose your payment type.\n'Prepaid' or 'Cash On Deli'.\n"
-                sock.send(payment.encode())
-                rec_payment = sock.recv(1024).decode()
-                check = obj.total_cost(total_list, rec_payment)
-                sock.send(check.encode())
-                for i in range(len(total_list)):
-                    total_list.pop(0)
-                print(check)
-                order = 'Order Confirmed.@'
-                print(total_list)
-                self.order(sock, order)  # error
+                self.confirm_order(sock)
             elif '4' in rec_option:
-                print('4')
+                length = len(total_list)
+                if length != 0:
+                    for i in range(len(total_list)):
+                        total_list.pop(0)
+                    cancel = 'Order Cancelled!'
+                    cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list)) + '@'
+                else:
+                    cancel = "You haven't chosen any menu yet!!@\n"
+                self.order(sock, cancel)
+            elif '5' in rec_option:
+                print('Client disconnected.')
             else:
                 recall = 'Invalid Option!!@'
                 self.order(sock, recall)
@@ -172,7 +134,7 @@ class TCPServer:
     def pick_menu(self, socket_client):
         with socket_client as sock:
             reply = str()
-            send_menu = reply + "Choose your menu :"
+            send_menu = reply + "Choose your menu  :"
             sock.send(send_menu.encode())
             rec_menu = sock.recv(1024).decode()
             # print(rec_menu)
@@ -181,7 +143,6 @@ class TCPServer:
                 print('Your item is unavailable.')
                 reply = 'Your item is unavailable.@\n'
                 self.order(sock, reply)
-                # self.order(socket_client)
             else:
                 print('Your item is available.')
                 menu_check = 'Menu available...\n' + menu_check
@@ -193,20 +154,34 @@ class TCPServer:
                 list_order = rec_order.split(',')
                 list_order.append(list_order[1])
                 list_order[1] = rec_menu
-                total_list.append(list_order)
+                count = 0
+                for list_m in total_list:
+                    if list_order[1].title() == list_m[1] and list_order[0].upper() == list_m[0]:
+                        count1 = int(list_order[2])
+                        count2 = int(list_m[2])
+                        count1 += count2
+                        list_m[2] = str(count1)
+                        count = 1
+                        break
+                    else:
+                        count = 0
+                if count == 0:
+                    total_list.append(list_order)
                 print(list_order)
+                print(total_list)
                 price = obj.count_cost(list_order[0], list_order[1], list_order[2])
                 sock.send(price.encode())
-                reply1 = 'Your item is available.@'
-                self.order(sock, reply1)
+                menu_chart = obj.menu_list(total_list)
+                self.order(sock, menu_chart)
 
-    def drop_menu(self, socket_client):
+    def update_menu(self, socket_client):
         with socket_client as sock:
             print('def.')
             length = len(total_list)
             if length != 0:
                 list_to_str = '\n'.join(map(str, total_list))
-                drop = list_to_str + '@Choose the menu you want to drop :&Enter the number of menu item    :'
+                drop = list_to_str + '@Choose the menu you want to edit :&Enter the shop name        :&' \
+                                     'Enter the number of menu item    :'
                 sock.send(drop.encode())
                 rec_drop = sock.recv(1024).decode()
                 drop_list = rec_drop.split(',')
@@ -214,36 +189,77 @@ class TCPServer:
                 length = len(total_list)
                 for i in range(length):
                     print('a')
-                    if total_list[i][1].title() == drop_list[0].title():
-                        menu = int(total_list[i][2])
-                        drop = int(drop_list[1])
-                        menu -= drop
-                        total_list[i][2] = str(menu)
-                        if menu <= 0:
+                    title1 = total_list[i][0].upper()
+                    title2 = total_list[i][1].title()
+                    if title2 == drop_list[0].title() and title1 == drop_list[1].upper():
+                        total_list[i][2] = drop_list[2]
+                        if int(total_list[i][2]) <= 0:
                             total_list.pop(i)
-                            break
-                print(total_list)
-                sock_str = "You've removed the menu from list.@"
+                        sock_str = "Menu Updated.\n"
+                        menu_chart = obj.menu_list(total_list)
+                        sock_str += menu_chart
+                        break
+                    else:
+                        sock_str = 'Menu not found.\n'
+                print(total_list, '\n', sock_str)
                 self.order(sock, sock_str)
             else:
                 print(total_list)
-                sock_str = "You haven't chosen any menu yet.@"
+                sock_str = "You haven't chosen any menu yet!!@\n"
                 self.order(sock, sock_str)
 
-    def to_Find(self, toFindInDatabase):
-        db = FetchData.DatabaseClass(toFindInDatabase)
-        DBdata = db.databaseMethod()
-        return DBdata
+    def confirm_order(self, client_socket):
+        with client_socket as sock:
+            length = len(total_list)
+            if length != 0:
+                location = 'Enter the address :'
+                sock.send(location.encode())
+                location_reply = sock.recv(1024).decode()
+                print(location_reply)
+                payment_option = "Choose your payment type.\n'1' for 'Prepaid'. // '2' for 'Cash-On-Deli'.\n"
+                sock.send(payment_option.encode())
+                while True:
+                    rec_option = sock.recv(1024).decode()
+                    if rec_option == '1':
+                        payment = "Transfer to this number.\n'09978652431' - KBZPay/WavePay/CBPay/AYAPay\n" \
+                                       "Type 'done' if you've transferred.\n"
+                        sock.send(payment.encode())
+                        rec_done = sock.recv(1024).decode()
+                        if 'done' in rec_done:
+                            check = obj.total_cost(total_list, 'Prepaid')
+                            sock.send(check.encode())
+                            break
+                        else:
+                            reply = 'Pls Transfer the amount first!!!\n'
+                            reply += payment_option
+                            sock.send(reply.encode())
+                    else:
+                        check = obj.total_cost(total_list, 'Cash-On-Deli')
+                        sock.send(check.encode())
+                        break
+
+                for i in range(len(total_list)):
+                    total_list.pop(0)
+                order = 'Order Confirmed.@\n'
+                print(total_list)
+            else:
+                order = "You haven't chosen any menu yet!!@\n"
+            self.order(sock, order)
 
 
 if __name__ == "__main__":
     while True:
-        # server_sms = input("Enter message to send back to Client :")
         server = TCPServer()
         server.main()
 
-# order check
-# if not done, can order continuously
-# count cost error
-# split order function if needed
-# add to cart
+# edit menu count (clear)
+# if choose same menu, must add to former menu count (clear)
+# error - same menus don't add & show twice (clear)
+# false shop name error
+# confirm order error - no menu pick (clear)
+# cancel order error - no menu  (clear)
+# show shop name on check (clear)
+# update menu error - only update first menu, add shop name in menu check (clear)
+
+# specify Classes
+# modify database
