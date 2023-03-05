@@ -63,7 +63,7 @@ class TCPServer:
                         i = len(id1)
                         obj.collection_2.insert_one({'_id': id1[i - 1] + 1, 'Username': receive_1[1], 'Password':
                                                     receive_1[2], 'PhoneNumber': int(receive_1[0]),
-                                                     'Address': receive_1[4]})
+                                                     'Address': receive_1[4], 'Record': 0, "Sign-in": 0})
                         print("Data Inserted.")
                         self.sign_in(sock)
                 else:
@@ -88,6 +88,12 @@ class TCPServer:
                 num2 = obj.check_pass(int(rec_list[0]), rec_list[1])
                 if num2 == 1:
                     print('Sign-in Success.')
+                    phNo = obj.collection_2.find().distinct('PhoneNumber')
+                    for i in phNo:
+                        if int(rec_list[0]) == i:
+                            data = obj.collection_2.find_one({'PhoneNumber': i})
+                            sign_in = data.get('Sign-in')
+                            sign_in += 1
                     menu = obj.showMenu()
                     sock.send(menu.encode())
                     str1 = ''
@@ -154,24 +160,28 @@ class TCPServer:
                 list_order = rec_order.split(',')
                 list_order.append(list_order[1])
                 list_order[1] = rec_menu
-                count = 0
-                for list_m in total_list:
-                    if list_order[1].title() == list_m[1] and list_order[0].upper() == list_m[0]:
-                        count1 = int(list_order[2])
-                        count2 = int(list_m[2])
-                        count1 += count2
-                        list_m[2] = str(count1)
-                        count = 1
-                        break
-                    else:
-                        count = 0
-                if count == 0:
-                    total_list.append(list_order)
-                print(list_order)
-                print(total_list)
-                price = obj.count_cost(list_order[0], list_order[1], list_order[2])
-                sock.send(price.encode())
-                menu_chart = obj.menu_list(total_list)
+                shop_check = obj.check_shop(list_order)
+                if shop_check == 'present':
+                    count = 0
+                    for list_m in total_list:
+                        if list_order[1].title() == list_m[1] and list_order[0].upper() == list_m[0]:
+                            count1 = int(list_order[2])
+                            count2 = int(list_m[2])
+                            count1 += count2
+                            list_m[2] = str(count1)
+                            count = 1
+                            break
+                        else:
+                            count = 0
+                    if count == 0:
+                        total_list.append(list_order)
+                    print(list_order)
+                    print(total_list)
+                    price = obj.count_cost(list_order[0], list_order[1], list_order[2])
+                    sock.send(price.encode())
+                    menu_chart = obj.menu_list(total_list)
+                else:
+                    menu_chart = 'Invalid Shop Name!!@\n'
                 self.order(sock, menu_chart)
 
     def update_menu(self, socket_client):
@@ -241,6 +251,13 @@ class TCPServer:
                 for i in range(len(total_list)):
                     total_list.pop(0)
                 order = 'Order Confirmed.@\n'
+                sign = obj.collection_2.find().distinct('Sign-in')
+                for i in sign:
+                    if i > 0:
+                        sign_in = obj.collection_2.find_one({'Sign-in': i})
+                        record = sign_in.get('Record')
+                        record += 1
+
                 print(total_list)
             else:
                 order = "You haven't chosen any menu yet!!@\n"
@@ -255,11 +272,14 @@ if __name__ == "__main__":
 # edit menu count (clear)
 # if choose same menu, must add to former menu count (clear)
 # error - same menus don't add & show twice (clear)
-# false shop name error
+# false shop name error (clear)
 # confirm order error - no menu pick (clear)
 # cancel order error - no menu  (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu check (clear)
+# add order history - note sign-in and use sign-in in order confirm function and plus one to record
+# add delivery men accounts
+# add admin accounts
 
 # specify Classes
 # modify database

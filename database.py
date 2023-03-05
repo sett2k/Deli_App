@@ -28,10 +28,12 @@ class Deliver:
                                                          'Fries': 1500, "Rice-Box": 1000, 'Pizza': 8000}}]
 
         data_2 = [
-            {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity"},
-            {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity"},
+            {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity",
+             "Record": 0, "Sign-in": 0},
+            {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity",
+             "Record": 0, "Sign-in": 0},
             {"_id": 3, "Username": "Three", "Password": "three#12", "PhoneNumber": 959333333333,
-             "Address": "ThreeCity"}
+             "Address": "ThreeCity", "Record": 0, "Sign-in": 0}
         ]
         # try:
         #     self.collection.insert_many(data)
@@ -103,6 +105,22 @@ class Deliver:
             return menu_str
         else:
             return 'none'
+
+    def check_shop(self, order):
+        menu = self.collection.find().distinct('Menu')
+        reply = str()
+        for i in menu:
+            for j in i:
+                if j == order[1].title():
+                    whole_menu = self.collection.find_one({'Menu': i})
+                    shop = whole_menu.get('Shop Name')
+                    print(whole_menu)
+                    print(shop)
+                    if shop == order[0].upper():
+                        return 'present'
+                    else:
+                        reply = 'absent'
+        return reply
 
     def count_cost(self, shop, item, number):
         shop1 = shop.upper()
