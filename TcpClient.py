@@ -39,7 +39,7 @@ class Client:
         else:
             print("Registration Complete.\nPls sign in to use our app.")
             # print(rec, '\n', rec_2, '\n', rec_3)
-            self.sign_in(reason, '*')
+            self.sign_in(rec_check, '*')
 
     def sign_in(self, rec_input, a):
         send_input = obj.splitData(rec_input, a)

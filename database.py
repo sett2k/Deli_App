@@ -2,6 +2,8 @@ import json
 
 import pymongo
 
+import datetime
+
 
 class Deliver:
     try:
@@ -9,12 +11,13 @@ class Deliver:
         database = connection['Database']
         collection = database['Menu Book']
         collection_2 = database['User-Data']
+        History = database['Order History']
     except Exception as error:
         print(error)
 
     def __init__(self):
 
-        data = [
+        menu = [
             {"_id": 1, "Shop Name": "Barlala", "Menu": {"Beer": 2000, 'Colds': 1500, 'Juices': 1500, 'BBQ': 10000,
                                                         'Hotpot': 8000, 'Salads': 2000, 'Fried Snacks': 2500,
                                                         'Beverages': 2000}},
@@ -27,7 +30,7 @@ class Deliver:
             {"_id": 4, "Shop Name": "Lotteria", "Menu": {"Fried Chicken": 2500, 'Burger': 3000, 'Cola': 1000,
                                                          'Fries': 1500, "Rice-Box": 1000, 'Pizza': 8000}}]
 
-        data_2 = [
+        user_info = [
             {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity",
              "Record": 0, "Sign-in": 0},
             {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity",
@@ -35,12 +38,17 @@ class Deliver:
             {"_id": 3, "Username": "Three", "Password": "three#12", "PhoneNumber": 959333333333,
              "Address": "ThreeCity", "Record": 0, "Sign-in": 0}
         ]
-        # try:
-        #     self.collection.insert_many(data)
-        #     self.collection.insert_many(data_2)
-        #     print('Data Inserted.')
-        # except Exception as error:
-        #     print(error)
+
+        history = [{"PhoneNumber": int(), "History": [{"shop name": "Barlala"}]}]
+
+        try:
+            #     #     self.Menu_Book.insert_many(menu)
+            #     #     self.User_Data.insert_many(user_info)
+            query = {"shop name": "Barlala"}
+            self.History.insert_many(history)
+            print('Data Inserted.')
+        except Exception as error:
+            print(error)
 
     def showMenu(self):
         shop = self.collection.find().distinct('Shop Name')
@@ -57,6 +65,17 @@ class Deliver:
             menu = menu + '\n' + shop_menu
         menu += '!You can order now!'
         return menu
+
+    def Ph_valid_check(self, phNo):
+        count = 0
+        for i in phNo:
+            if 48 <= ord(i) <= 57:
+                count += 1
+            else:
+                count = 0
+                break
+        return count
+
 
     def checkPh(self, phNo):
         b = 0
@@ -136,7 +155,7 @@ class Deliver:
         cost += count + total
         return cost
 
-    def total_cost(self, total_list, payment):
+    def total_cost(self, total_list, payment, phoneNo):
         total = 0
         menu_list = str()
         for list_a in total_list:
@@ -152,15 +171,31 @@ class Deliver:
             price = menu_dict.get(list_i[0])
             cost = price * int(list_i[2])
             total += cost
-            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') -> "' + list_i[0] + '" = ' + str(cost) + '\n'
+            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') -> "' + list_i[0] + '" = ' + str(
+                cost) + '\n'
         deli_fee = 3000
         total += deli_fee
         deli_fee2 = 'Deli fees = ' + str(deli_fee) + '\n'
         payment_type = "Payment Type >> '" + payment + "'\n"
-        menu = '......dailY deli......\n'
-        menu += menu_list + deli_fee2 + 'Total cost = ' + str(total) + '\n' + payment_type + '--- THANK YOU FOR ' \
-                                                                                             'SUPPORTING US! ---'
+        deli = '......dailY deli......\n'
+        x = datetime.datetime.now()
+        date = x.strftime("%d/%b/%Y__%I:%M:%S-%p")
+        date = 'Order date    : ' + date
+        phNo = "\nCustomer's Ph : " + str(phoneNo) + '\n'
+        menu = deli + date + phNo + menu_list + deli_fee2 + 'Total cost = ' + str(total) + '\n' + payment_type + '--- THANK YOU ' \
+                                                                                                    'FOR SUPPORTING ' \
+                                                                                                    'US! --- '
         return menu
+
+    def record_sign_in(self, phNo):
+        phNumber = self.collection_2.find().distinct('PhoneNumber')
+        for i in phNumber:
+            if phNo == i:
+                data = self.collection_2.find_one({'PhoneNumber': phNo})
+                sign_in = data.get('Sign-in')
+                original_rec = {'Sign-in': sign_in}
+                updated_rec = {'$set': {'Sign-in': sign_in + 1}}
+                self.collection_2.update_one(original_rec, updated_rec)
 
     def menu_list(self, list_menu):
         for list_i in list_menu:

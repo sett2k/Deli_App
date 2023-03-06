@@ -65,6 +65,8 @@ class TCPServer:
                                                     receive_1[2], 'PhoneNumber': int(receive_1[0]),
                                                      'Address': receive_1[4], 'Record': 0, "Sign-in": 0})
                         print("Data Inserted.")
+                        send1 = 'Account successfully created.\n'
+                        sock.send(send1.encode())
                         self.sign_in(sock)
                 else:
                     temp3 = 'Password must have at least 8 counts.'
@@ -78,6 +80,7 @@ class TCPServer:
     def sign_in(self, socket_client):
         with socket_client as sock:
             send_input = obj.sign_in_Str()
+            print(send_input)
             sock.send(send_input.encode())
             rec_input = sock.recv(1024).decode()
             print("Received data :", rec_input)
@@ -88,12 +91,13 @@ class TCPServer:
                 num2 = obj.check_pass(int(rec_list[0]), rec_list[1])
                 if num2 == 1:
                     print('Sign-in Success.')
-                    phNo = obj.collection_2.find().distinct('PhoneNumber')
-                    for i in phNo:
-                        if int(rec_list[0]) == i:
-                            data = obj.collection_2.find_one({'PhoneNumber': i})
-                            sign_in = data.get('Sign-in')
-                            sign_in += 1
+                    obj.record_sign_in(int(rec_list[0]))
+                    # phNo = obj.collection_2.find().distinct('PhoneNumber')
+                    # for i in phNo:
+                    #     if int(rec_list[0]) == i:
+                    #         data = obj.collection_2.find_one({'PhoneNumber': i})
+                    #         sign_in = data.get('Sign-in')
+                    #         sign_in += 1
                     menu = obj.showMenu()
                     sock.send(menu.encode())
                     str1 = ''
@@ -222,42 +226,47 @@ class TCPServer:
         with client_socket as sock:
             length = len(total_list)
             if length != 0:
-                location = 'Enter the address :'
+                location = 'Enter the address       :'
                 sock.send(location.encode())
                 location_reply = sock.recv(1024).decode()
-                print(location_reply)
-                payment_option = "Choose your payment type.\n'1' for 'Prepaid'. // '2' for 'Cash-On-Deli'.\n"
-                sock.send(payment_option.encode())
-                while True:
-                    rec_option = sock.recv(1024).decode()
-                    if rec_option == '1':
-                        payment = "Transfer to this number.\n'09978652431' - KBZPay/WavePay/CBPay/AYAPay\n" \
-                                       "Type 'done' if you've transferred.\n"
-                        sock.send(payment.encode())
-                        rec_done = sock.recv(1024).decode()
-                        if 'done' in rec_done:
-                            check = obj.total_cost(total_list, 'Prepaid')
+                phoneNo = 'Enter your Phone Number :'
+                sock.send(phoneNo.encode())
+                phNumber = sock.recv(1024).decode()
+                phNo = int(phNumber)
+                if 959999999999 >= phNo > 959100000000:
+                    print(location_reply, phNo)
+                    payment_option = "Choose your payment type.\n'1' for 'Prepaid'. // '2' for 'Cash-On-Deli'.\n"
+                    sock.send(payment_option.encode())
+                    while True:
+                        rec_option = sock.recv(1024).decode()
+                        if rec_option == '1':
+                            payment = "Transfer to this number.\n'09978652431' - KBZPay/WavePay/CBPay/AYAPay\n" \
+                                           "Type 'done' if you've transferred.\n"
+                            sock.send(payment.encode())
+                            rec_done = sock.recv(1024).decode()
+                            if 'done' in rec_done:
+                                check = obj.total_cost(total_list, 'Prepaid', phNo)
+                                sock.send(check.encode())
+                                break
+                            else:
+                                reply = 'Pls Transfer the amount first!!!\n'
+                                reply += payment_option
+                                sock.send(reply.encode())
+                        else:
+                            check = obj.total_cost(total_list, 'Cash-On-Deli', phNo)
                             sock.send(check.encode())
                             break
-                        else:
-                            reply = 'Pls Transfer the amount first!!!\n'
-                            reply += payment_option
-                            sock.send(reply.encode())
-                    else:
-                        check = obj.total_cost(total_list, 'Cash-On-Deli')
-                        sock.send(check.encode())
-                        break
-
-                for i in range(len(total_list)):
-                    total_list.pop(0)
-                order = 'Order Confirmed.@\n'
-                sign = obj.collection_2.find().distinct('Sign-in')
-                for i in sign:
-                    if i > 0:
-                        sign_in = obj.collection_2.find_one({'Sign-in': i})
-                        record = sign_in.get('Record')
-                        record += 1
-
+                    for i in range(len(total_list)):
+                        total_list.pop(0)
+                    order = 'Order Confirmed.@\n'
+                    sign = obj.collection_2.find().distinct('Sign-in')
+                    for i in sign:
+                        if i > 0:
+                            sign_in = obj.collection_2.find_one({'Sign-in': i})
+                            record = sign_in.get('Record')
+                            record += 1
+                else:
+                    order = 'Invalid Phone Number!!@\n'
                 print(total_list)
             else:
                 order = "You haven't chosen any menu yet!!@\n"
@@ -277,9 +286,12 @@ if __name__ == "__main__":
 # cancel order error - no menu  (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu check (clear)
-# add order history - note sign-in and use sign-in in order confirm function and plus one to record
+# add order history - note sign-in acc and use sign-in acc in order confirm function and plus one to record
 # add delivery men accounts
 # add admin accounts
+# add date to check
+# back functions for client
+# input validation for every function
 
 # specify Classes
 # modify database

@@ -69,9 +69,10 @@
 # # cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list))
 # # print(cancel)
 #
-from database import Deliver
+# from database import Deliver
+
 #
-obj = Deliver()
+# obj = Deliver()
 #
 # order = ['barlala', 'tomato salad', '4']
 # menu = obj.collection.find().distinct('Menu')
@@ -88,12 +89,38 @@ obj = Deliver()
 #             else:
 #                 print('absent')
 #
-name = obj.collection_2.find().distinct('PhoneNumber')
-print(name)
-h = obj.collection_2.find_one({'PhoneNumber': name[0]})
-print(h)
-i = h.get('Sign-in')
-print(i)
-i += 1
-print(i)
-print(h)
+# a = 959222222222
+# name = obj.collection_2.find().distinct('PhoneNumber')
+# print(name)
+# phNo = obj.collection_2.find_one({'PhoneNumber': a})
+# print(phNo)
+# obj.History.insert_one({
+#     '_id': 1,
+#     'firstName': "John",
+#     'lastName': "King",
+#     'email': "john.king@abc.com",
+#     'salary': 5000,
+#     'skills': ["Angular", "React", "MongoDB"]
+# })
+# var query = { $set: {'firstName':"Morgan"}}
+# obj.History.update_one({'_id': 1}, {'_id': 1, 'firstName': 'Morgan'})
+# obj.History.update_many({"PhoneNumber": 0}, {"History": [$set:{"PhoneNumber": 0, "shop name": "lotteria"}]})
+import datetime
+
+x = datetime.datetime.now()
+date = x.strftime("%d/%b/%Y__%I:%M:%S-%p")
+print(date)
+print(type(date))
+a = '7'
+print(ord(a))
+print(type(ord(a)))
+
+phNo = '95l96654456'
+count = 0
+for i in phNo:
+    if 48 <= ord(i) <= 57:
+        count += 1
+    else:
+        count = 0
+        break
+print('Count :', count)
