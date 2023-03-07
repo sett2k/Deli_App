@@ -60,6 +60,8 @@ class Client:
             if 'cost' in rec_input:
                 print(rec_input)
                 self.order()
+            elif rec_input == 'exit':
+                self.runClient()
             else:
                 if '@' in rec_input:
                     rec_list = rec_input.split('@')

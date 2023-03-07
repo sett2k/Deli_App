@@ -66,16 +66,15 @@ class Deliver:
         menu += '!You can order now!'
         return menu
 
-    def Ph_valid_check(self, phNo):
+    def num_valid_check(self, num):
         count = 0
-        for i in phNo:
+        for i in num:
             if 48 <= ord(i) <= 57:
                 count += 1
             else:
                 count = 0
                 break
         return count
-
 
     def checkPh(self, phNo):
         b = 0
@@ -171,7 +170,7 @@ class Deliver:
             price = menu_dict.get(list_i[0])
             cost = price * int(list_i[2])
             total += cost
-            menu_list += list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') -> "' + list_i[0] + '" = ' + str(
+            menu_list += "'" + list_i[0] + "' -> " + list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') = ' + str(
                 cost) + '\n'
         deli_fee = 3000
         total += deli_fee
@@ -182,9 +181,10 @@ class Deliver:
         date = x.strftime("%d/%b/%Y__%I:%M:%S-%p")
         date = 'Order date    : ' + date
         phNo = "\nCustomer's Ph : " + str(phoneNo) + '\n'
-        menu = deli + date + phNo + menu_list + deli_fee2 + 'Total cost = ' + str(total) + '\n' + payment_type + '--- THANK YOU ' \
-                                                                                                    'FOR SUPPORTING ' \
-                                                                                                    'US! --- '
+        menu = deli + date + phNo + menu_list + deli_fee2 + 'Total cost = ' + str(
+            total) + '\n' + payment_type + '--- THANK YOU ' \
+                                           'FOR SUPPORTING ' \
+                                           'US! --- '
         return menu
 
     def record_sign_in(self, phNo):
@@ -194,8 +194,42 @@ class Deliver:
                 data = self.collection_2.find_one({'PhoneNumber': phNo})
                 sign_in = data.get('Sign-in')
                 original_rec = {'Sign-in': sign_in}
-                updated_rec = {'$set': {'Sign-in': sign_in + 1}}
+                updated_rec = {'$set': {'Sign-in': 1}}
                 self.collection_2.update_one(original_rec, updated_rec)
+                print('Sign-in updated.')
+
+    def delete_signin_record(self):
+        phoneNo = self.collection_2.find().distinct('PhoneNumber')
+        for i in phoneNo:
+            data = self.collection_2.find_one({'PhoneNumber': i})
+            sign_value = data.get('Sign-in')
+            original_value = {'Sign-in': sign_value}
+            updated_value = {'$set': {'Sign-in': 0}}
+            self.collection_2.update_one(original_value, updated_value)
+        print('Sign-in record deleted.')
+
+    def record_order(self, phNo, list_total, payment):
+        # count = 0
+        sign_rec = self.collection_2.find().distinct('Sign-in')
+        for i in sign_rec:
+            if i > 0:
+                doc = self.collection_2.find_one({'Sign-in': i})
+                record = doc.get('Record')
+                original_rec = {'Record': record}
+                order_check = self.total_cost(list_total, payment, phNo)
+                updated_rec = {'$set': {'Record': record + '@\n' + order_check}}
+                self.collection_2.update_one(original_rec, updated_rec)
+
+        # if count > 0:
+        #     rec_data = self.collection_2.find_one({'PhoneNumber': phNo})
+        #     record = rec_data.get('Record')
+        #     original_rec = {'Record': record}
+        #
+        #     updated_rec = {'$set': {'Record': record + '@\n' + order_check}}
+        #     self.collection_2.update_one(original_rec, updated_rec)
+                print('Record updated.')
+        # else:
+        #     print('no record update.')
 
     def menu_list(self, list_menu):
         for list_i in list_menu:

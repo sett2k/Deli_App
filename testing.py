@@ -69,10 +69,11 @@
 # # cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list))
 # # print(cancel)
 #
-# from database import Deliver
+from database import Deliver
+import datetime
 
 #
-# obj = Deliver()
+obj = Deliver()
 #
 # order = ['barlala', 'tomato salad', '4']
 # menu = obj.collection.find().distinct('Menu')
@@ -104,8 +105,8 @@
 # })
 # var query = { $set: {'firstName':"Morgan"}}
 # obj.History.update_one({'_id': 1}, {'_id': 1, 'firstName': 'Morgan'})
-# obj.History.update_many({"PhoneNumber": 0}, {"History": [$set:{"PhoneNumber": 0, "shop name": "lotteria"}]})
-import datetime
+# phNo = 959123321123
+# obj.History.update_many({"PhoneNumber": 0}, {"$set": {"History": [{"PhoneNumber": phNo, "shop name": "lotteria"}]}})
 
 x = datetime.datetime.now()
 date = x.strftime("%d/%b/%Y__%I:%M:%S-%p")
@@ -115,7 +116,7 @@ a = '7'
 print(ord(a))
 print(type(ord(a)))
 
-phNo = '95l96654456'
+phNo = '9596654456'
 count = 0
 for i in phNo:
     if 48 <= ord(i) <= 57:
@@ -123,4 +124,34 @@ for i in phNo:
     else:
         count = 0
         break
-print('Count :', count)
+print('Count :', count, type(count))
+
+phNum = 959453741976
+count = 0
+# phNumber = obj.collection_2.find().distinct('PhoneNumber')
+# for i in phNumber:
+#     if phNo == i:
+#         data = obj.collection_2.find_one({'PhoneNumber': phNo})
+#         sign_in = data.get('Sign-in')
+#         sign_list = sign_in.split('@')
+#         for j in sign_list:
+#             if j == 'sign-in':
+#                 count += 1
+# if count > 0:
+#     rec_data = obj.collection_2.find_one({'PhoneNumber': phNo})
+#     record = rec_data.get('Record')
+#     original_rec = {'Record': record}
+#     updated_rec = {'$set': {'Record': record + '@record'}}
+#     obj.collection_2.update_one(original_rec, updated_rec)
+#     print('Record updated.')
+# else:
+#     print('no record update.')
+# phNumber = obj.collection_2.find().distinct('PhoneNumber')
+# for i in phNumber:
+#     if phNum == i:
+#         data = obj.collection_2.find_one({'PhoneNumber': phNum})
+#         sign_in = data.get('Sign-in')
+#         original_rec = {'Sign-in': sign_in}
+#         updated_rec = {'$set': {'Sign-in': sign_in + 1}}
+#         obj.collection_2.update_one(original_rec, updated_rec)
+#         print('Sign-in updated.')
