@@ -39,13 +39,13 @@ class Deliver:
              "Address": "ThreeCity", "Record": 0, "Sign-in": 0}
         ]
 
-        history = [{"PhoneNumber": int(), "History": [{"shop name": "Barlala"}]}]
+        history = [{"_id": 1, "PhoneNumber": int(), "History": [{"shop name": "Barlala"}]}]
 
         try:
             #     #     self.Menu_Book.insert_many(menu)
             #     #     self.User_Data.insert_many(user_info)
-            query = {"shop name": "Barlala"}
-            self.History.insert_many(history)
+            # query = {"shop name": "Barlala"}
+            # self.History.insert_many(history)
             print('Data Inserted.')
         except Exception as error:
             print(error)
@@ -194,7 +194,7 @@ class Deliver:
                 data = self.collection_2.find_one({'PhoneNumber': phNo})
                 sign_in = data.get('Sign-in')
                 original_rec = {'Sign-in': sign_in}
-                updated_rec = {'$set': {'Sign-in': 1}}
+                updated_rec = {'$set': {'Sign-in': sign_in + 'sign-in'}}
                 self.collection_2.update_one(original_rec, updated_rec)
                 print('Sign-in updated.')
 
@@ -204,32 +204,33 @@ class Deliver:
             data = self.collection_2.find_one({'PhoneNumber': i})
             sign_value = data.get('Sign-in')
             original_value = {'Sign-in': sign_value}
-            updated_value = {'$set': {'Sign-in': 0}}
+            updated_value = {'$set': {'Sign-in': str(i)}}
             self.collection_2.update_one(original_value, updated_value)
         print('Sign-in record deleted.')
 
     def record_order(self, phNo, list_total, payment):
-        # count = 0
+        count = 0
         sign_rec = self.collection_2.find().distinct('Sign-in')
         for i in sign_rec:
-            if i > 0:
+            if 'sign-in' in i:
                 doc = self.collection_2.find_one({'Sign-in': i})
                 record = doc.get('Record')
                 original_rec = {'Record': record}
                 order_check = self.total_cost(list_total, payment, phNo)
-                updated_rec = {'$set': {'Record': record + '@\n' + order_check}}
+                updated_rec = {'$set': {'Record': record + '@\n\n' + order_check}}
                 self.collection_2.update_one(original_rec, updated_rec)
+                print('Sign-in record updated.')
+                return 1
+            else:
+                print('no record update.')
+        return count
 
-        # if count > 0:
-        #     rec_data = self.collection_2.find_one({'PhoneNumber': phNo})
-        #     record = rec_data.get('Record')
-        #     original_rec = {'Record': record}
-        #
-        #     updated_rec = {'$set': {'Record': record + '@\n' + order_check}}
-        #     self.collection_2.update_one(original_rec, updated_rec)
-                print('Record updated.')
-        # else:
-        #     print('no record update.')
+    def record_order_2(self, phoneNo, list_total, pay_type):
+        order_id = self.History.find().distinct('_id')
+        i = len(order_id)
+        bill = self.total_cost(list_total, pay_type, phoneNo)
+        self.History.insert_one({'_id': order_id[i-1]+1, 'PhoneNumber': phoneNo, 'History': bill})
+        print('No-sign-in record updated.')
 
     def menu_list(self, list_menu):
         for list_i in list_menu:

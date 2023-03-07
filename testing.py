@@ -155,3 +155,16 @@ count = 0
 #         updated_rec = {'$set': {'Sign-in': sign_in + 1}}
 #         obj.collection_2.update_one(original_rec, updated_rec)
 #         print('Sign-in updated.')
+list_total = [['LOTTERIA', 'Pizza', '5'], ['BARLALA', 'Beer', '10'], ['PAN-EI', 'Tea Leaf Salad', '2']]
+payment = 'Prepaid'
+phoneNo = 959966760561
+sign_rec = obj.collection_2.find().distinct('Sign-in')
+for i in sign_rec:
+    if 'sign-in' in i:
+        doc = obj.collection_2.find_one({'Sign-in': i})
+        record = doc.get('Record')
+        original_rec = {'Record': record}
+        order_check = obj.total_cost(list_total, payment, phoneNo)
+        updated_rec = {'$set': {'Record': record + '@\n' + order_check}}
+        obj.collection_2.update_one(original_rec, updated_rec)
+        print('Record updated.')

@@ -146,6 +146,7 @@ class TCPServer:
                     cancel = "You haven't chosen any menu yet!!@\n"
                 self.order(sock, cancel)
             elif '5' in rec_option:
+                obj.delete_signin_record()
                 print('Client disconnected.')
                 exit_t = 'exit'
                 sock.send(exit_t.encode())
@@ -273,7 +274,9 @@ class TCPServer:
                                 rec_done = sock.recv(1024).decode()
                                 if 'done' in rec_done:
                                     check = obj.total_cost(total_list, 'Prepaid', phNo)
-                                    obj.record_order(phNo, total_list, 'Prepaid')
+                                    count = obj.record_order(phNo, total_list, 'Prepaid')
+                                    if count == 0:
+                                        obj.record_order_2(phNo, total_list, 'Prepaid')
                                     sock.send(check.encode())
                                     break
                                 else:
@@ -282,7 +285,9 @@ class TCPServer:
                                     sock.send(reply.encode())
                             elif rec_option == '2':
                                 check = obj.total_cost(total_list, 'Cash-On-Deli', phNo)
-                                obj.record_order(phNo, total_list, 'Cash-On-Deli')
+                                count2 = obj.record_order(phNo, total_list, 'Cash-On-Deli')
+                                if count2 == 0:
+                                    obj.record_order_2(phNo, total_list, 'Cash-On-Deli')
                                 sock.send(check.encode())
                                 break
                             else:
@@ -315,7 +320,7 @@ if __name__ == "__main__":
 # cancel order error - no menu  (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu check (clear)
-# add order history - note sign-in acc and use sign-in acc in order confirm function and plus one to record
+# add order history - no_sign_in record(check phNo, if sign-in phNo: add to sign-in acc, else: add to new collection)
 # add delivery men accounts
 # add admin accounts
 # add date to check
