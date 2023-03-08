@@ -68,10 +68,11 @@ class TCPServer:
                             self.create_Acc(socket_client)
                         else:
                             id1 = obj.collection_2.find().distinct('_id')
-                            i = len(id1)
-                            obj.collection_2.insert_one({'_id': id1[i - 1] + 1, 'Username': receive_1[1], 'Password':
+                            # i = len(id1)
+                            obj.collection_2.insert_one({'_id': id1[-1] + 1, 'Username': receive_1[1], 'Password':
                                                         receive_1[2], 'PhoneNumber': int(receive_1[0]),
-                                                         'Address': receive_1[4], 'Record': 0, "Sign-in": receive_1[0]})
+                                                         'Address': receive_1[4], 'Record': receive_1[0],
+                                                         "Sign-in": receive_1[0]})
                             print("Data Inserted.")
                             send1 = 'Account successfully created.\n'
                             sock.send(send1.encode())
@@ -274,6 +275,8 @@ class TCPServer:
                                 rec_done = sock.recv(1024).decode()
                                 if 'done' in rec_done:
                                     check = obj.total_cost(total_list, 'Prepaid', phNo)
+                                    obj.transfer_record(total_list, phNo)
+                                    obj.record_deli(phNo, total_list, 'Prepaid')
                                     count = obj.record_order(phNo, total_list, 'Prepaid')
                                     if count == 0:
                                         obj.record_order_2(phNo, total_list, 'Prepaid')
@@ -285,6 +288,7 @@ class TCPServer:
                                     sock.send(reply.encode())
                             elif rec_option == '2':
                                 check = obj.total_cost(total_list, 'Cash-On-Deli', phNo)
+                                obj.record_deli(phNo, total_list, 'Cash-On-Deli')
                                 count2 = obj.record_order(phNo, total_list, 'Cash-On-Deli')
                                 if count2 == 0:
                                     obj.record_order_2(phNo, total_list, 'Cash-On-Deli')
@@ -320,12 +324,12 @@ if __name__ == "__main__":
 # cancel order error - no menu  (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu check (clear)
-# add order history - no_sign_in record(check phNo, if sign-in phNo: add to sign-in acc, else: add to new collection)
-# add delivery men accounts
-# add admin accounts
-# add date to check
-# back functions for client
+# add order history - no_sign_in record, sign_in record(clear)
+# add admin accounts - transfer cost to admin if prepaid(clear)
+# add date to check (clear)
+# back functions for client - pls enter 'back' to step back
 # input validation for every function - num valid check
+# add delivery men accounts (clear)
 
 # specify Classes
 # modify database

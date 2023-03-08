@@ -12,6 +12,7 @@ class Deliver:
         collection = database['Menu Book']
         collection_2 = database['User-Data']
         History = database['Order History']
+        Deli_Men = database['Deli-Men']
     except Exception as error:
         print(error)
 
@@ -32,14 +33,14 @@ class Deliver:
 
         user_info = [
             {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity",
-             "Record": 0, "Sign-in": 0},
+             "Transfer-Record": '', "Sign-in": 0},
             {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity",
-             "Record": 0, "Sign-in": 0},
+             "Record": '959222222222', "Sign-in": 0},
             {"_id": 3, "Username": "Three", "Password": "three#12", "PhoneNumber": 959333333333,
-             "Address": "ThreeCity", "Record": 0, "Sign-in": 0}
+             "Address": "ThreeCity", "Record": '959333333333', "Sign-in": 0}
         ]
 
-        history = [{"_id": 1, "PhoneNumber": int(), "History": [{"shop name": "Barlala"}]}]
+        # history = [{"_id": 1, "PhoneNumber": int(), "Order-History": ""}]
 
         try:
             #     #     self.Menu_Book.insert_many(menu)
@@ -108,10 +109,10 @@ class Deliver:
         menu_str = str()
         for i in menu:
             for j in i:
-                if j.title() == item.title():
+                if j.upper() == item.upper():
                     menu_dict = self.collection.find_one({'Menu': i})
                     shop_name = menu_dict.get('Shop Name')
-                    price = i.get(item.title())
+                    price = i.get(j)
                     shop_list.append(shop_name)
                     price_list.append(price)
                     menu_list = zip(shop_list, price_list)
@@ -129,7 +130,7 @@ class Deliver:
         reply = str()
         for i in menu:
             for j in i:
-                if j == order[1].title():
+                if j.upper() == order[1].upper():
                     whole_menu = self.collection.find_one({'Menu': i})
                     shop = whole_menu.get('Shop Name')
                     print(whole_menu)
@@ -173,19 +174,39 @@ class Deliver:
             menu_list += "'" + list_i[0] + "' -> " + list_i[2] + ' * ' + list_i[1] + '(' + str(price) + ') = ' + str(
                 cost) + '\n'
         deli_fee = 3000
-        total += deli_fee
-        deli_fee2 = 'Deli fees = ' + str(deli_fee) + '\n'
+        total_fee = total + deli_fee
+        deli_fee2 = '\nDeli fees = ' + str(deli_fee) + '\n'
         payment_type = "Payment Type >> '" + payment + "'\n"
         deli = '......dailY deli......\n'
         x = datetime.datetime.now()
-        date = x.strftime("%d/%b/%Y__%I:%M:%S-%p")
+        date = x.strftime("%d/%b/%Y__%I:%M:%S_%p")
         date = 'Order date    : ' + date
         phNo = "\nCustomer's Ph : " + str(phoneNo) + '\n'
-        menu = deli + date + phNo + menu_list + deli_fee2 + 'Total cost = ' + str(
-            total) + '\n' + payment_type + '--- THANK YOU ' \
-                                           'FOR SUPPORTING ' \
-                                           'US! --- '
+        menu = deli + date + phNo + menu_list + 'Total = ' + str(total) + deli_fee2 + 'Total cost = ' + str(
+            total_fee) + '\n' + payment_type + '--- THANK YOU ' \
+                                               'FOR SUPPORTING ' \
+                                               'US! --- '
         return menu
+
+    def transfer_record(self, sum_list, phNum):
+        cash = self.total_cost(sum_list, 'Prepaid', phNum)
+        cash_list = cash.split('\n')
+        x = datetime.datetime.now()
+        date = x.strftime("%d/%b/%Y__%I:%M:%S_%p")
+        amount = ''
+        for i in range(len(cash_list)):
+            if 'Total cost' in cash_list[i]:
+                total = cash_list[i].split(' = ')
+                amount = total[1]
+                break
+        admin_doc = self.collection_2.find_one({'_id': 1})
+        transfer = admin_doc.get('Transfer-Record')
+        phoneNum = str(phNum)
+        update = transfer + '\n' + phoneNum + '-' + amount + '-' + date
+        original_transfer = {'Transfer-Record': transfer}
+        updated_transfer = {'$set': {'Transfer-Record': update}}
+        self.collection_2.update_one(original_transfer, updated_transfer)
+        print('Transfer Record Updated.')
 
     def record_sign_in(self, phNo):
         phNumber = self.collection_2.find().distinct('PhoneNumber')
@@ -193,9 +214,9 @@ class Deliver:
             if phNo == i:
                 data = self.collection_2.find_one({'PhoneNumber': phNo})
                 sign_in = data.get('Sign-in')
-                original_rec = {'Sign-in': sign_in}
-                updated_rec = {'$set': {'Sign-in': sign_in + 'sign-in'}}
-                self.collection_2.update_one(original_rec, updated_rec)
+                original_value = {'Sign-in': sign_in}
+                updated_value = {'$set': {'Sign-in': sign_in + 'sign-in'}}
+                self.collection_2.update_one(original_value, updated_value)
                 print('Sign-in updated.')
 
     def delete_signin_record(self):
@@ -222,15 +243,60 @@ class Deliver:
                 print('Sign-in record updated.')
                 return 1
             else:
-                print('no record update.')
+                print('no record updated.')
         return count
 
     def record_order_2(self, phoneNo, list_total, pay_type):
+        count = 0
+        phoneNum = self.collection_2.find().distinct('PhoneNumber')
         order_id = self.History.find().distinct('_id')
-        i = len(order_id)
+        # i = len(order_id)
         bill = self.total_cost(list_total, pay_type, phoneNo)
-        self.History.insert_one({'_id': order_id[i-1]+1, 'PhoneNumber': phoneNo, 'History': bill})
-        print('No-sign-in record updated.')
+        for i in phoneNum:
+            if phoneNo == i:
+                ph_doc = self.collection_2.find_one({'PhoneNumber': phoneNo})
+                record = ph_doc.get('Record')
+                original_record = {'Record': record}
+                updated_record = {'$set': {'Record': record + '@\n\n' + bill}}
+                self.collection_2.update_one(original_record, updated_record)
+                print('Sign-in record updated.')
+                count = 1
+                break
+            else:
+                count = 0
+        if count == 0:
+            sum_up = 0
+            phNumber = self.History.find().distinct('PhoneNumber')
+            for j in phNumber:
+                if j == phoneNo:
+                    doc_ph = self.History.find_one({'PhoneNumber': phoneNo})
+                    history = doc_ph.get('Order-History')
+                    original_history = {'Order-History': history}
+                    updated_history = {'$set': {'Order-History': history + '@\n\n' + bill}}
+                    self.History.update_one(original_history, updated_history)
+                    print('No-sign-in same record updated.')
+                    sum_up = 1
+                    break
+                else:
+                    sum_up = 0
+            if sum_up == 0:
+                self.History.insert_one({'_id': order_id[-1] + 1, 'PhoneNumber': phoneNo, 'Order-History': bill})
+                print('No-sign-in different record updated.')
+
+    def record_deli(self, cusPh, menu_list, pay_ment):
+        deli_bill = self.total_cost(menu_list, pay_ment, cusPh)
+        deli_ph = self.Deli_Men.find().distinct('PhoneNumber')
+        for i in deli_ph:
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': i})
+            deli_req = deli_doc.get('Customer-Request')
+            original_req = {'Customer-Request': deli_req}
+            updated_req = {'$set': {'Customer-Request': deli_req + '@\n\n' + deli_bill}}
+            self.Deli_Men.update_one(original_req, updated_req)
+            duty = deli_doc.get('Duty-Record')
+            original_duty = {'Duty-Record': duty}
+            updated_duty = {'$set': {'Duty-Record': duty + '@\nduty'}}
+            self.Deli_Men.update_one(original_duty, updated_duty)
+            print('Deli-record updated.')
 
     def menu_list(self, list_menu):
         for list_i in list_menu:
