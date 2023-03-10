@@ -5,6 +5,7 @@ from database import Deliver
 
 obj = Deliver()
 total_list = []
+back_str = str()
 
 
 class TCPServer:
@@ -29,19 +30,21 @@ class TCPServer:
 
     def handle_client(self, client_socket):
         with client_socket as sock:
+            obj.delete_signin_record()
             request = sock.recv(1024)
             toFindInDatabase = request.decode()
-            print('Received Data From Client:', toFindInDatabase)
-            # print(type(deli.data_o()))
+            print('Received Data From Client :', toFindInDatabase)
             if toFindInDatabase == '1':
                 return_r = obj.showMenu()
                 sock.send(return_r.encode())
                 order = '\nOrder Session...@'
                 self.order(sock, order)
             elif toFindInDatabase == '2':
-                self.create_Acc(sock)
+                send_create = 'Account Creation Session...@\n'
+                self.create_Acc(sock, send_create)
             elif toFindInDatabase == '3':
-                self.sign_in(sock)
+                send_sign = 'Sign-in Session...@\n'
+                self.sign_in(sock, send_sign)
             elif toFindInDatabase == '4':
                 exit(1)
             else:
@@ -49,51 +52,50 @@ class TCPServer:
                 sock.send(invalid.encode())
                 self.handle_client(sock)
 
-    def create_Acc(self, socket_client):
+    def create_Acc(self, socket_client, create_str):
         with socket_client as sock:
             send_b = obj.create_Str()
+            send_b = create_str + send_b
             sock.send(send_b.encode())
             receive = sock.recv(1024).decode()
             print("Received data :", receive)
             receive_1 = receive.split(',')
             print(receive_1)
+            for i in receive_1:
+                if i == 'back':
+                    self.create_Acc(sock, back_str)
             num_check = obj.num_valid_check(receive_1[0])
             if num_check != 0:
                 num = obj.checkPh(int(receive_1[0]))
                 if num == 2:
                     if len(receive_1[2]) >= 8:
                         if receive_1[2] != receive_1[3]:
-                            temp = 'Check Your Password Again!!'
-                            sock.send(temp.encode())
-                            self.create_Acc(socket_client)
+                            temp = 'Check Your Password Again!!@\n'
+                            self.create_Acc(sock, temp)
                         else:
                             id1 = obj.collection_2.find().distinct('_id')
-                            # i = len(id1)
                             obj.collection_2.insert_one({'_id': id1[-1] + 1, 'Username': receive_1[1], 'Password':
                                                         receive_1[2], 'PhoneNumber': int(receive_1[0]),
                                                          'Address': receive_1[4], 'Record': receive_1[0],
                                                          "Sign-in": receive_1[0]})
                             print("Data Inserted.")
-                            send1 = 'Account successfully created.\n'
-                            sock.send(send1.encode())
-                            self.sign_in(sock)
+                            send1 = 'Sign-in Session...@\n'
+                            self.sign_in(sock, send1)
                     else:
-                        temp3 = 'Password must have at least 8 counts.'
-                        sock.send(temp3.encode())
-                        self.create_Acc(socket_client)
+                        temp3 = 'Password must have at least 8 counts.@\n'
+                        self.create_Acc(socket_client, temp3)
                 else:
-                    temp2 = "Invalid PhoneNumber!!\nPls start with '959' and enter total '9' numbers."
-                    sock.send(temp2.encode())
-                    self.create_Acc(socket_client)
+                    temp2 = "Invalid PhoneNumber!!\nPls start with '959' and enter total '9' numbers.@\n"
+                    self.create_Acc(socket_client, temp2)
             else:
-                reply = 'Invalid Phone Number!!'
-                sock.send(reply.encode())
-                self.create_Acc(sock)
+                reply = 'Invalid Phone Number!!@\n'
+                self.create_Acc(sock, reply)
 
-    def sign_in(self, socket_client):
+    def sign_in(self, socket_client, sign_str):
         with socket_client as sock:
             obj.delete_signin_record()
             send_input = obj.sign_in_Str()
+            send_input = sign_str + send_input
             sock.send(send_input.encode())
             rec_input = sock.recv(1024).decode()
             print("Received data :", rec_input)
@@ -108,17 +110,17 @@ class TCPServer:
                         obj.record_sign_in(int(rec_list[0]))
                         menu = obj.showMenu()
                         sock.send(menu.encode())
-                        str1 = ''
+                        str1 = 'Order Session...@'
                         self.order(sock, str1)
                     else:
-                        print('Check Password.')
-                        self.sign_in(socket_client)
+                        invalid_2 = 'Check Password!@\n'
+                        self.sign_in(sock, invalid_2)
                 else:
-                    print('Invalid Number!.')
-                    self.sign_in(socket_client)
+                    invalid_1 = 'Invalid Number!.@\n'
+                    self.sign_in(sock, invalid_1)
             else:
-                print('Invalid Number.')
-                self.sign_in(sock)
+                invalid = 'Invalid Number.@\n'
+                self.sign_in(sock, invalid)
 
     def order(self, socket_client, str_order):
         with socket_client as sock:
@@ -137,15 +139,7 @@ class TCPServer:
             elif '3' in rec_option:
                 self.confirm_order(sock)
             elif '4' in rec_option:
-                length = len(total_list)
-                if length != 0:
-                    for i in range(len(total_list)):
-                        total_list.pop(0)
-                    cancel = 'Order Cancelled!'
-                    cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list)) + '@'
-                else:
-                    cancel = "You haven't chosen any menu yet!!@\n"
-                self.order(sock, cancel)
+                self.cancel_order(sock)
             elif '5' in rec_option:
                 obj.delete_signin_record()
                 print('Client disconnected.')
@@ -162,7 +156,8 @@ class TCPServer:
             send_menu = reply + "Choose your menu  :"
             sock.send(send_menu.encode())
             rec_menu = sock.recv(1024).decode()
-            # print(rec_menu)
+            if rec_menu == 'back':
+                self.order(sock, back_str)
             menu_check = obj.check_menu(rec_menu)
             if 'none' in menu_check:
                 print('Your item is unavailable.')
@@ -177,6 +172,9 @@ class TCPServer:
                 sock.send(send_order.encode())
                 rec_order = sock.recv(1024).decode()
                 list_order = rec_order.split(',')
+                for i in list_order:
+                    if i == 'back':
+                        self.order(sock, back_str)
                 list_order.append(list_order[1])
                 list_order[1] = rec_menu
                 shop_check = obj.check_shop(list_order)
@@ -219,6 +217,9 @@ class TCPServer:
                 sock.send(drop.encode())
                 rec_drop = sock.recv(1024).decode()
                 drop_list = rec_drop.split(',')
+                for i in drop_list:
+                    if i == 'back':
+                        self.order(sock, back_str)
                 num_check = obj.num_valid_check(drop_list[2])
                 if num_check == 0:
                     check_no = 'Invalid count!!\n'
@@ -251,35 +252,49 @@ class TCPServer:
         with client_socket as sock:
             length = len(total_list)
             if length != 0:
-                location = 'Enter the address       :'
+                location = "Press '1' for Quarter-1.\nPress '2' for Quarter-2.\nPress '3' for Quarter-3.\nPress '4' " \
+                           "for" \
+                           " Quarter-4.\nPress '5' for Quarter-5.\nPress '6' for Quarter-6.\nPress '7' for" \
+                           " Quarter-7.\n" \
+                           "Press '8' for Quarter-8.\nPress '9' for Quarter-9.\nPress '10' for Quarter-10.\n" \
+                           "Choose Your Address     :"
                 sock.send(location.encode())
                 location_reply = sock.recv(1024).decode()
+                num_check = obj.num_valid_check(location_reply)
+                if location_reply == 'back':
+                    self.order(sock, back_str)
+                if num_check == 0:
+                    self.confirm_order(sock)
                 phoneNo = 'Enter your Phone Number :'
                 sock.send(phoneNo.encode())
                 phNumber = sock.recv(1024).decode()
+                if phNumber == 'back':
+                    self.order(sock, back_str)
                 check_num = obj.num_valid_check(phNumber)
                 if check_num == 0:
                     self.confirm_order(sock)
                 else:
                     phNo = int(phNumber)
                     if 959999999999 >= phNo > 959100000000:
-                        print(location_reply, phNo)
+                        print(location_reply, ',', phNo)
                         payment_option = "Choose your payment type.\n'1' for 'Prepaid'. // '2' for 'Cash-On-Deli'.\n"
                         sock.send(payment_option.encode())
                         while True:
                             rec_option = sock.recv(1024).decode()
+                            if rec_option == 'back':
+                                self.order(sock, back_str)
                             if rec_option == '1':
                                 payment = "Transfer to this number.\n'09978652431' - KBZPay/WavePay/CBPay/AYAPay\n" \
-                                               "Type 'done' if you've transferred.\n"
+                                          "Type 'done' if you've transferred.\n"
                                 sock.send(payment.encode())
                                 rec_done = sock.recv(1024).decode()
                                 if 'done' in rec_done:
-                                    check = obj.total_cost(total_list, 'Prepaid', phNo)
-                                    obj.transfer_record(total_list, phNo)
-                                    obj.record_deli(phNo, total_list, 'Prepaid')
-                                    count = obj.record_order(phNo, total_list, 'Prepaid')
+                                    check = obj.total_cost(total_list, 'Prepaid', phNo, location_reply)
+                                    obj.transfer_record(total_list, phNo, location_reply)
+                                    obj.record_deli(phNo, total_list, 'Prepaid', location_reply)
+                                    count = obj.record_order(phNo, total_list, 'Prepaid', location_reply)
                                     if count == 0:
-                                        obj.record_order_2(phNo, total_list, 'Prepaid')
+                                        obj.record_order_2(phNo, total_list, 'Prepaid', location_reply)
                                     sock.send(check.encode())
                                     break
                                 else:
@@ -287,11 +302,11 @@ class TCPServer:
                                     reply += payment_option
                                     sock.send(reply.encode())
                             elif rec_option == '2':
-                                check = obj.total_cost(total_list, 'Cash-On-Deli', phNo)
-                                obj.record_deli(phNo, total_list, 'Cash-On-Deli')
-                                count2 = obj.record_order(phNo, total_list, 'Cash-On-Deli')
+                                check = obj.total_cost(total_list, 'Cash-On-Deli', phNo, location_reply)
+                                obj.record_deli(phNo, total_list, 'Cash-On-Deli', location_reply)
+                                count2 = obj.record_order(phNo, total_list, 'Cash-On-Deli', location_reply)
                                 if count2 == 0:
-                                    obj.record_order_2(phNo, total_list, 'Cash-On-Deli')
+                                    obj.record_order_2(phNo, total_list, 'Cash-On-Deli', location_reply)
                                 sock.send(check.encode())
                                 break
                             else:
@@ -310,6 +325,28 @@ class TCPServer:
                 order = "You haven't chosen any menu yet!!@\n"
             self.order(sock, order)
 
+    def cancel_order(self, socket_client):
+        with socket_client as sock:
+            length = len(total_list)
+            if length != 0:
+                for i in range(len(total_list)):
+                    total_list.pop(0)
+                cancel = 'Order Cancelled!'
+                cancel += '\nYour Menu Chart >> \n' + '\n'.join(map(str, total_list)) + '@'
+            else:
+                cancel = "You haven't chosen any menu yet!!@\n"
+            self.order(sock, cancel)
+
+    # def back_for_acc(self, str1, client_socket):
+    #     with client_socket as sock:
+    #         print('back function.', str1)
+    #         sock.send(str1.encode())
+
+    def back_for_order(self, client_socket, cli_reply):
+        with client_socket as sock:
+            if "back" == cli_reply:
+                self.order(sock, back_str)
+
 
 if __name__ == "__main__":
     while True:
@@ -324,7 +361,7 @@ if __name__ == "__main__":
 # cancel order error - no menu  (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu check (clear)
-# add order history - no_sign_in record, sign_in record(clear)
+# add order history - sign_in record, no-sign_in record(clear)
 # add admin accounts - transfer cost to admin if prepaid(clear)
 # add date to check (clear)
 # back functions for client - pls enter 'back' to step back

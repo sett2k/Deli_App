@@ -14,45 +14,67 @@ class Client:
 
     def runClient(self):
         option = obj.intro()
+        count = 0
+        option_list = ['1', '2', '3']
+        for i in option_list:
+            if i == option:
+                count = 1
+                break
+        if count == 0:
+            self.runClient()
         self.client.send(option.encode())
-        receive = self.client.recv(1024).decode()
-        if '$' in receive:
-            print('Account Creating Session...')
-            self.create(receive, '$')
-        elif '*' in receive:
-            print('Sign-In Session...')
-            self.sign_in(receive, '*')
-        else:
+        if option == '1':
+            receive = self.client.recv(1024).decode()
             print('______ Our Menu-Book ______')
             print(receive)
             self.order()
+        elif option == '2':
+            self.create()
+        elif option == '3':
+            self.sign_in()
+
+        # if '$' in receive:
+        #     print('Account Creating Session...')
+        #     self.create()
+        # elif '*' in receive:
+        #     print('Sign-In Session...')
+        #     self.sign_in(receive, '*')
+        # else:
+
         self.client.close()
 
-    def create(self, rec_input, a):
-        str_input = obj.splitData(rec_input, a)
+    def create(self):
+        rec_input = self.client.recv(1024).decode()
+        if '@\n' in rec_input:
+            rec_list = rec_input.split('@\n')
+            print(rec_list[0])
+            rec_list.pop(0)
+            rec_input = str()
+            rec_input = rec_input.join(rec_list)
+        elif '*' in rec_input:
+            self.sign_in()
+        str_input = obj.splitData(rec_input, '$')
         self.client.send(str_input.encode())
-        reason = self.client.recv(1024).decode()
-        rec_check = self.client.recv(1024).decode()
-        if rec_check == rec_input:
-            print(reason)
-            self.create(rec_check, a)
-        else:
-            print("Registration Complete.\nPls sign in to use our app.")
-            # print(rec, '\n', rec_2, '\n', rec_3)
-            self.sign_in(rec_check, '*')
+        if 'back' in str_input:
+            self.create()
+        if 'exit' in str_input:
+            self.runClient()
+        self.create()
 
-    def sign_in(self, rec_input, a):
-        send_input = obj.splitData(rec_input, a)
-        self.client.send(send_input.encode())
-        rec_check = self.client.recv(1024).decode()
-        if rec_check == rec_input:
-            print('try again.')
-            self.sign_in(rec_check, a)
-        else:
-            print('Signed-in Success.\n_____ Our Menu _____')
-            print(rec_check)
-            # rec_input2 = self.client.recv(1024).decode()
+    def sign_in(self):
+        rec_input = self.client.recv(1024).decode()
+        print(rec_input)
+        if '@\n' in rec_input:
+            rec_list = rec_input.split('@\n')
+            print(rec_list[0])
+            rec_list.pop(0)
+            rec_input = str()
+            rec_input = rec_input.join(rec_list)
+        elif 'Order' in rec_input:
             self.order()
+        send_input = obj.splitData(rec_input, '*')
+        self.client.send(send_input.encode())
+        self.sign_in()
 
     def order(self):
         while True:
@@ -82,3 +104,5 @@ if __name__ == "__main__":
     print('+======== WELCOME TO "dailY deli" =========+')
     ClientConnector = Client()
     ClientConnector.runClient()
+
+# invalid option

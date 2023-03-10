@@ -1,24 +1,35 @@
 # from database import Deliver
+#
 # obj = Deliver()
-# # listt = [1, 2, 3, 4, 5, 6]
-# # print(listt[-1]+1)
-# # list_total = [['LOTTERIA', 'Pizza', '5'], ['BARLALA', 'Beer', '10'], ['PAN-EI', 'Tea Leaf Salad', '2']]
-# # cash = obj.total_cost(list_total, 'Prepaid', 959213321123)
-# # cash_list = cash.split('\n')
-# # print(cash_list)
-# # for i in range(len(cash_list)):
-# #     if 'Total cost' in cash_list[i]:
-# #         total = cash_list[i].split(' = ')
-# #         print(total)
-# #         print(total[1])
 #
-# deli_men = [{'_id': 1, 'Deli-Location': 'Pyin Oo Lwin', 'PhoneNumber': 959171717171, 'Customer-Request': '959171717171',
-#              'Duty-Record': '959171717171'}, {'_id': 2, 'Deli-Location': 'Pyin Oo Lwin', 'PhoneNumber': 959272727272,
-#             'Customer-Request': '959272727272', 'Duty-Record': '959272727272'}, {'_id': 3, 'Deli-Location': 'PyinOLwin',
-#             'PhoneNumber': 959373737373, 'Customer-Request': '959373737373', 'Duty-Record': '959373737373'}]
-#
-# try:
-#     obj.Deli_Men.insert_many(deli_men)
-#     print('Deli Inserted.')
-# except Exception as error:
-#     print(error)
+# menu_list = [['LOTTERIA', 'Pizza', '5']]
+# pay_ment = 'Prepaid'
+# cusPh = 959966760561
+# location = '8'
+# deli_bill = obj.total_cost(menu_list, pay_ment, cusPh, location)
+# deli_doc = {}
+# location = int(location)
+# if location == 1 or location == 2:
+#     deli_doc = obj.Deli_Men.find_one({'PhoneNumber': 959171717171})
+# elif location == 3 or location == 4:
+#     deli_doc = obj.Deli_Men.find_one({'PhoneNumber': 959272727272})
+# elif location == 5 or location == 6:
+#     deli_doc = obj.Deli_Men.find_one({'PhoneNumber': 959373737373})
+# elif location == 7 or location == 8:
+#     deli_doc = obj.Deli_Men.find_one({'PhoneNumber': 959474747474})
+# elif location == 9 or location == 10:
+#     deli_doc = obj.Deli_Men.find_one({'PhoneNumber': 959575757575})
+# deli_req = deli_doc.get('Customer-Order')
+# original_req = {'Customer-Order': deli_req}
+# updated_req = {'$set': {'Customer-Order': deli_req + '@\n\n' + deli_bill}}
+# obj.Deli_Men.update_one(original_req, updated_req)
+# duty = deli_doc.get('Duty-Record')
+# original_duty = {'Duty-Record': duty}
+# updated_duty = {'$set': {'Duty-Record': duty + '@\nduty'}}
+# obj.Deli_Men.update_one(original_duty, updated_duty)
+# print('Deli-record updated.')
+str1 = 'loop'
+list1 = str1.split(',')
+print(list1)
+strS = ','.join(map(str, list1))
+print(strS)

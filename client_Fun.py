@@ -16,7 +16,8 @@ class Function:
             exit(1)
         else:
             print('Invalid Option.')
-            self.intro()
+            return key
+            # self.intro()
 
     def splitData(self, rec, a):
         r_list = rec.split(a)
@@ -24,6 +25,8 @@ class Function:
         for i in r_list:
             temp = input(i)
             s_list.append(temp)
+            if temp == 'back':
+                break
 
         strS = ','.join(map(str, s_list))
         return strS

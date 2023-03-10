@@ -18,29 +18,39 @@ class Deliver:
 
     def __init__(self):
 
-        menu = [
-            {"_id": 1, "Shop Name": "Barlala", "Menu": {"Beer": 2000, 'Colds': 1500, 'Juices': 1500, 'BBQ': 10000,
-                                                        'Hotpot': 8000, 'Salads': 2000, 'Fried Snacks': 2500,
-                                                        'Beverages': 2000}},
-            {"_id": 2, "Shop Name": "Pan Ei",
-             "Menu": {"Tea Leaf Salad": 2000, 'Popcorn Salad': 2000, 'Ginger Salad': 2000, 'Pennyworth Salad': 2000,
-                      "Tomato Salad": 2000}, "Drink": {'Lemon': 500, 'Apple': 15000}},
-            {"_id": 3, "Shop Name": "THU TASTY",
-             "Menu": {"Lemon": 1500, 'Lime': 1500, 'Orange': 1500, 'Strawberry': 1500, 'Aml': 1500, 'Grape': 1500,
-                      'Apple': 1500, 'Pineapple': 1500, "Watermelon": 1500, 'Bubble Tea': 2000}},
-            {"_id": 4, "Shop Name": "Lotteria", "Menu": {"Fried Chicken": 2500, 'Burger': 3000, 'Cola': 1000,
-                                                         'Fries': 1500, "Rice-Box": 1000, 'Pizza': 8000}}]
-
-        user_info = [
-            {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity",
-             "Transfer-Record": '', "Sign-in": 0},
-            {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity",
-             "Record": '959222222222', "Sign-in": 0},
-            {"_id": 3, "Username": "Three", "Password": "three#12", "PhoneNumber": 959333333333,
-             "Address": "ThreeCity", "Record": '959333333333', "Sign-in": 0}
-        ]
+        # menu = [
+        #     {"_id": 1, "Shop Name": "Barlala", "Menu": {"Beer": 2000, 'Colds': 1500, 'Juices': 1500, 'BBQ': 10000,
+        #                                                 'Hotpot': 8000, 'Salads': 2000, 'Fried Snacks': 2500,
+        #                                                 'Beverages': 2000}},
+        #     {"_id": 2, "Shop Name": "Pan Ei",
+        #      "Menu": {"Tea Leaf Salad": 2000, 'Popcorn Salad': 2000, 'Ginger Salad': 2000, 'Pennyworth Salad': 2000,
+        #               "Tomato Salad": 2000}, "Drink": {'Lemon': 500, 'Apple': 15000}},
+        #     {"_id": 3, "Shop Name": "THU TASTY",
+        #      "Menu": {"Lemon": 1500, 'Lime': 1500, 'Orange': 1500, 'Strawberry': 1500, 'Aml': 1500, 'Grape': 1500,
+        #               'Apple': 1500, 'Pineapple': 1500, "Watermelon": 1500, 'Bubble Tea': 2000}},
+        #     {"_id": 4, "Shop Name": "Lotteria", "Menu": {"Fried Chicken": 2500, 'Burger': 3000, 'Cola': 1000,
+        #                                                  'Fries': 1500, "Rice-Box": 1000, 'Pizza': 8000}}]
+        #
+        # user_info = [
+        #     {"_id": 1, "Username": "One", "Password": "one#1234", "PhoneNumber": 95911111111, "Address": "OneCity",
+        #      "Transfer-Record": '', "Sign-in": 0},
+        #     {"_id": 2, "Username": "Two", "Password": "two#1234", "PhoneNumber": 959222222222, "Address": "TwoCity",
+        #      "Record": '959222222222', "Sign-in": 0},
+        #     {"_id": 3, "Username": "Three", "Password": "three#12", "PhoneNumber": 959333333333,
+        #      "Address": "ThreeCity", "Record": '959333333333', "Sign-in": 0}
+        # ]
 
         # history = [{"_id": 1, "PhoneNumber": int(), "Order-History": ""}]
+
+        # deli_men = [
+        #     {'_id': 1, 'Deli-Area': 'Quarter 1&2', 'PhoneNumber': 959171717171, 'Customer-Order': '959171717171',
+        #      'Duty-Record': '959171717171'}, {'_id': 2, 'Deli-Area': 'Quarter 3&4', 'PhoneNumber': 959272727272,
+        #                                       'Customer-Order': '959272727272', 'Duty-Record': '959272727272'},
+        #     {'_id': 3, 'Deli-Area': 'Quarter 5&6',
+        #      'PhoneNumber': 959373737373, 'Customer-Order': '959373737373', 'Duty-Record': '959373737373'},
+        #     {'_id': 4, 'Deli-Area': 'Quarter 7&8', 'PhoneNumber': 959474747474, 'Customer-Order': '959474747474',
+        #      'Duty-Record': '959474747474'}, {'_id': 5, 'Deli-Area': 'Quarter 9&10', 'PhoneNumber': 959575757575,
+        #                                       'Customer-Order': '959575757575', 'Duty-Record': '959575757575'}]
 
         try:
             #     #     self.Menu_Book.insert_many(menu)
@@ -79,7 +89,7 @@ class Deliver:
 
     def checkPh(self, phNo):
         b = 0
-        if 959999999999 >= phNo > 959111111110:
+        if 959999999999 >= phNo > 959100000000:
             a = 2
         else:
             a = 0
@@ -155,7 +165,8 @@ class Deliver:
         cost += count + total
         return cost
 
-    def total_cost(self, total_list, payment, phoneNo):
+    def total_cost(self, total_list, payment, phoneNo, location):
+        # print(type(location))
         total = 0
         menu_list = str()
         for list_a in total_list:
@@ -180,16 +191,17 @@ class Deliver:
         deli = '......dailY deli......\n'
         x = datetime.datetime.now()
         date = x.strftime("%d/%b/%Y__%I:%M:%S_%p")
-        date = 'Order date    : ' + date
-        phNo = "\nCustomer's Ph : " + str(phoneNo) + '\n'
-        menu = deli + date + phNo + menu_list + 'Total = ' + str(total) + deli_fee2 + 'Total cost = ' + str(
+        date = 'Order date         : ' + date
+        phNo = "\nCustomer's Ph      : " + str(phoneNo)
+        address = "\nCustomer's Address : Quarter - " + location + '\n'
+        menu = deli + date + phNo + address + menu_list + 'Total = ' + str(total) + deli_fee2 + 'Total cost = ' + str(
             total_fee) + '\n' + payment_type + '--- THANK YOU ' \
                                                'FOR SUPPORTING ' \
                                                'US! --- '
         return menu
 
-    def transfer_record(self, sum_list, phNum):
-        cash = self.total_cost(sum_list, 'Prepaid', phNum)
+    def transfer_record(self, sum_list, phNum, location):
+        cash = self.total_cost(sum_list, 'Prepaid', phNum, location)
         cash_list = cash.split('\n')
         x = datetime.datetime.now()
         date = x.strftime("%d/%b/%Y__%I:%M:%S_%p")
@@ -199,9 +211,18 @@ class Deliver:
                 total = cash_list[i].split(' = ')
                 amount = total[1]
                 break
+        sign_in_list = self.collection_2.find().distinct('Sign-in')
+        phoneNum = str()
+        for i in sign_in_list:
+            if 'sign-in' in i:
+                sign_doc = self.collection_2.find_one({'Sign-in': i})
+                phoneNo = sign_doc.get('PhoneNumber')
+                phoneNum = str(phoneNo)
+                break
+            else:
+                phoneNum = str(phNum)
         admin_doc = self.collection_2.find_one({'_id': 1})
         transfer = admin_doc.get('Transfer-Record')
-        phoneNum = str(phNum)
         update = transfer + '\n' + phoneNum + '-' + amount + '-' + date
         original_transfer = {'Transfer-Record': transfer}
         updated_transfer = {'$set': {'Transfer-Record': update}}
@@ -229,7 +250,7 @@ class Deliver:
             self.collection_2.update_one(original_value, updated_value)
         print('Sign-in record deleted.')
 
-    def record_order(self, phNo, list_total, payment):
+    def record_order(self, phNo, list_total, payment, location):
         count = 0
         sign_rec = self.collection_2.find().distinct('Sign-in')
         for i in sign_rec:
@@ -237,7 +258,7 @@ class Deliver:
                 doc = self.collection_2.find_one({'Sign-in': i})
                 record = doc.get('Record')
                 original_rec = {'Record': record}
-                order_check = self.total_cost(list_total, payment, phNo)
+                order_check = self.total_cost(list_total, payment, phNo, location)
                 updated_rec = {'$set': {'Record': record + '@\n\n' + order_check}}
                 self.collection_2.update_one(original_rec, updated_rec)
                 print('Sign-in record updated.')
@@ -246,12 +267,12 @@ class Deliver:
                 print('no record updated.')
         return count
 
-    def record_order_2(self, phoneNo, list_total, pay_type):
+    def record_order_2(self, phoneNo, list_total, pay_type, location):
         count = 0
         phoneNum = self.collection_2.find().distinct('PhoneNumber')
         order_id = self.History.find().distinct('_id')
         # i = len(order_id)
-        bill = self.total_cost(list_total, pay_type, phoneNo)
+        bill = self.total_cost(list_total, pay_type, phoneNo, location)
         for i in phoneNum:
             if phoneNo == i:
                 ph_doc = self.collection_2.find_one({'PhoneNumber': phoneNo})
@@ -283,20 +304,28 @@ class Deliver:
                 self.History.insert_one({'_id': order_id[-1] + 1, 'PhoneNumber': phoneNo, 'Order-History': bill})
                 print('No-sign-in different record updated.')
 
-    def record_deli(self, cusPh, menu_list, pay_ment):
-        deli_bill = self.total_cost(menu_list, pay_ment, cusPh)
-        deli_ph = self.Deli_Men.find().distinct('PhoneNumber')
-        for i in deli_ph:
-            deli_doc = self.Deli_Men.find_one({'PhoneNumber': i})
-            deli_req = deli_doc.get('Customer-Request')
-            original_req = {'Customer-Request': deli_req}
-            updated_req = {'$set': {'Customer-Request': deli_req + '@\n\n' + deli_bill}}
-            self.Deli_Men.update_one(original_req, updated_req)
-            duty = deli_doc.get('Duty-Record')
-            original_duty = {'Duty-Record': duty}
-            updated_duty = {'$set': {'Duty-Record': duty + '@\nduty'}}
-            self.Deli_Men.update_one(original_duty, updated_duty)
-            print('Deli-record updated.')
+    def record_deli(self, cusPh, menu_list, pay_ment, location):
+        deli_bill = self.total_cost(menu_list, pay_ment, cusPh, location)
+        deli_doc = {}
+        if location == '1' or location == '2':
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': 959171717171})
+        elif location == '3' or location == '4':
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': 959272727272})
+        elif location == '5' or location == '6':
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': 959373737373})
+        elif location == '7' or location == '8':
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': 959474747474})
+        elif location == '9' or location == '10':
+            deli_doc = self.Deli_Men.find_one({'PhoneNumber': 959575757575})
+        deli_req = deli_doc.get('Customer-Order')
+        original_req = {'Customer-Order': deli_req}
+        updated_req = {'$set': {'Customer-Order': deli_req + '@\n\n' + deli_bill}}
+        self.Deli_Men.update_one(original_req, updated_req)
+        duty = deli_doc.get('Duty-Record')
+        original_duty = {'Duty-Record': duty}
+        updated_duty = {'$set': {'Duty-Record': duty + '@\nduty'}}
+        self.Deli_Men.update_one(original_duty, updated_duty)
+        print('Deli-record updated.')
 
     def menu_list(self, list_menu):
         for list_i in list_menu:
