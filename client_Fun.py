@@ -25,7 +25,7 @@ class Function:
         for i in r_list:
             temp = input(i)
             s_list.append(temp)
-            if temp == 'back':
+            if temp == 'back' or temp == 'stop':
                 break
 
         strS = ','.join(map(str, s_list))

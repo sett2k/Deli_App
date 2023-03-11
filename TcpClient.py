@@ -44,41 +44,46 @@ class Client:
         self.client.close()
 
     def create(self):
-        rec_input = self.client.recv(1024).decode()
-        if '@\n' in rec_input:
-            rec_list = rec_input.split('@\n')
-            print(rec_list[0])
-            rec_list.pop(0)
-            rec_input = str()
-            rec_input = rec_input.join(rec_list)
-        elif '*' in rec_input:
-            self.sign_in()
-        str_input = obj.splitData(rec_input, '$')
-        self.client.send(str_input.encode())
-        if 'back' in str_input:
-            self.create()
-        if 'exit' in str_input:
-            self.runClient()
-        self.create()
+        while True:
+            rec_input = self.client.recv(1024).decode()
+            if '@\n' in rec_input:
+                rec_list = rec_input.split('@\n')
+                print(rec_list[0])
+                rec_list.pop(0)
+                rec_input = str()
+                rec_input = rec_input.join(rec_list)
+            elif 'sign-in' in rec_input:
+                print(rec_input)
+                self.sign_in()
+            str_input = obj.splitData(rec_input, '$')
+            self.client.send(str_input.encode())
+            if 'back' in str_input:
+                self.create()
+            if 'stop' in str_input:
+                self.runClient()
 
     def sign_in(self):
-        rec_input = self.client.recv(1024).decode()
-        print(rec_input)
-        if '@\n' in rec_input:
-            rec_list = rec_input.split('@\n')
-            print(rec_list[0])
-            rec_list.pop(0)
-            rec_input = str()
-            rec_input = rec_input.join(rec_list)
-        elif 'Order' in rec_input:
-            self.order()
-        send_input = obj.splitData(rec_input, '*')
-        self.client.send(send_input.encode())
-        self.sign_in()
+        while True:
+            rec_input = self.client.recv(1024).decode()
+            if '@\n' in rec_input:
+                rec_list = rec_input.split('@\n')
+                print(rec_list[0])
+                rec_list.pop(0)
+                rec_input = str()
+                rec_input = rec_input.join(rec_list)
+            elif 'order' in rec_input:
+                self.order()
+            send_input = obj.splitData(rec_input, '*')
+            self.client.send(send_input.encode())
+            if 'back' in send_input:
+                self.sign_in()
+            if 'stop' in send_input:
+                self.runClient()
 
     def order(self):
         while True:
             rec_input = self.client.recv(1024).decode()
+            # print(rec_input)
             if 'cost' in rec_input:
                 print(rec_input)
                 self.order()
