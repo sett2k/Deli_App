@@ -19,9 +19,10 @@ The MIT License. See the file LICENSE in this repository's base directory.
 # cancel order error - no menu pick (clear)
 # show shop name on check (clear)
 # update menu error - only update first menu, add shop name in menu_check (clear)
-# add order history - note sign-in and use sign-in in order_confirm function and plus one to record
-# add delivery men accounts
-# add admin accounts
+# add order history - note sign-in and use sign-in in order_confirm function and plus one to record (clear)
+# add delivery men accounts (clear)
+# add admin accounts (clear)
+# back functions - 'back' for step back and 'stop' to go back to former function (clear)
 
 # specify Classes
 # modify database
